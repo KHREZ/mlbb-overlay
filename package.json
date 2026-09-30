@@ -1,0 +1,17 @@
+{
+  "name": "my-mlbb-overlay",
+  "version": "1.0.0",
+  "description": "Professional MLBB Esports Tournament Broadcast & Overlay System for OBS Studio",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node scripts/sanity-test.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "obs-websocket-js": "^5.0.8",
+    "sharp": "^0.35.3",
+    "ws": "^8.17.0"
+  }
+}

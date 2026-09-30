@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLBB Be Right Back Screen</title>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      width: 1920px; height: 1080px;
+      overflow: hidden;
+      background: rgba(7, 10, 18, 0.92);
+      font-family: 'Teko', sans-serif;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .wrap { text-align: center; position: relative; z-index: 2; }
+    .brb {
+      font-size: 150px;
+      letter-spacing: 6px;
+      font-weight: 700;
+      color: #fbbf24;
+      text-shadow: 0 0 40px rgba(245, 158, 11, 0.7);
+      animation: blink 1.8s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; text-shadow: 0 0 40px rgba(245, 158, 11, 0.7); }
+      50% { opacity: 0.45; text-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }
+    }
+    .msg {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 5px;
+      color: #cbd5e1;
+      margin-top: 10px;
+      text-transform: uppercase;
+      animation: fadeUp 0.6s ease 0.3s both;
+    }
+    @keyframes fadeUp {
+      from { transform: translateY(15px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .stamp {
+      position: absolute;
+      bottom: 30px;
+      right: 40px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 15px;
+      color: #64748b;
+      letter-spacing: 2px;
+      z-index: 2;
+    }
+
+    /* Decorative lines */
+    .line-left, .line-right {
+      position: absolute;
+      top: 50%;
+      width: 300px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(245, 158, 11, 0.4), transparent);
+    }
+    .line-left { left: 80px; transform: translateY(-50%); }
+    .line-right { right: 80px; transform: translateY(-50%); }
+
+    /* Particles */
+    .particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .particle {
+      position: absolute;
+      width: 2px; height: 2px;
+      background: rgba(245, 158, 11, 0.3);
+      border-radius: 50%;
+      animation: float 8s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.2; }
+      50% { transform: translateY(-60px) scale(1.5); opacity: 0.6; }
+    }
+  </style>
+</head>
+<body>
+  <div class="particles" id="particles"></div>
+  <div class="line-left"></div>
+  <div class="line-right"></div>
+  <div class="wrap">
+    <div class="brb">BE RIGHT BACK</div>
+    <div id="brbMsg" class="msg">PLEASE STAND BY</div>
+  </div>
+  <div id="brbStamp" class="stamp">MLBB OVERLAY SYSTEM</div>
+
+  <script>
+    // Generate particles
+    const pc = document.getElementById('particles');
+    for (let i = 0; i < 15; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = Math.random() * 100 + '%';
+      p.style.top = Math.random() * 100 + '%';
+      p.style.animationDelay = Math.random() * 8 + 's';
+      p.style.animationDuration = (5 + Math.random() * 5) + 's';
+      pc.appendChild(p);
+    }
+    async function render() {
+      try {
+        const d = await (await fetch('/api/data?t=' + Date.now())).json();
+        document.getElementById('brbMsg').innerText = (d.draftState && d.draftState.phaseText) || 'PLEASE STAND BY';
+        document.getElementById('brbStamp').innerText = d.tournamentName || 'MLBB OVERLAY SYSTEM';
+      } catch (_) {}
+    }
+    render();
+    setInterval(render, 2000);
+  </script>
+</body>
+</html>

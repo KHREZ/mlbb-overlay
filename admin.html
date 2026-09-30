@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLBB Tournament Control Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;800&family=Teko:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background: #090d16;
+      color: #f8fafc;
+      padding: 18px;
+      min-width: 320px;
+    }
+    @media (max-width: 768px) {
+      body { padding: 10px; }
+      h1 { font-size: 22px !important; }
+      header { padding: 10px 14px; }
+      .tabs { gap: 4px; }
+      .tab-btn { font-size: 15px; padding: 6px 12px; }
+      .panel { padding: 14px; }
+      .grid-2 { grid-template-columns: 1fr !important; gap: 14px !important; }
+      .grid-3 { grid-template-columns: 1fr !important; gap: 10px !important; }
+      .section-title { font-size: 19px; }
+      .scene-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)) !important; }
+      .scene-btn { font-size: 17px; padding: 12px 8px; }
+      .btn { font-size: 17px; padding: 8px 16px; }
+      .stat-line { gap: 8px; }
+      .draft-row { padding: 6px; }
+      .draft-row span { font-size: 16px; min-width: 36px; }
+      .draft-row input, .draft-row select { font-size: 13px; padding: 5px; min-width: 0 !important; }
+      .score-display { font-size: 28px; width: 36px; }
+      .preset-btns { flex-wrap: wrap; }
+    }
+    @media (max-width: 480px) {
+      .status-row { gap: 8px; }
+      .live-status, .obs-status { font-size: 11px; }
+      .scene-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 14px 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    h1 {
+      font-family: 'Teko', sans-serif;
+      font-size: 30px;
+      color: #fbbf24;
+      letter-spacing: 1px;
+    }
+
+    .status-row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+    .live-status { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #22c55e; }
+    .obs-status { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #94a3b8; }
+    .obs-status.on { color: #38bdf8; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot.green { background: #22c55e; box-shadow: 0 0 8px #22c55e; animation: pulse 1.5s infinite; }
+    .dot.gray { background: #475569; }
+    .dot.blue { background: #38bdf8; box-shadow: 0 0 8px #38bdf8; animation: pulse 1.5s infinite; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; transform: scale(1.15); }
+    }
+
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .tab-btn {
+      font-family: 'Teko', sans-serif;
+      font-size: 19px;
+      letter-spacing: 1px;
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      padding: 8px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tab-btn.active { background: #f59e0b; color: #090d16; border-color: #f59e0b; font-weight: 700; }
+
+    .panel { display: none; background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 22px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4); }
+    .panel.active { display: block; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    @media (max-width: 500px) { .grid-2 { grid-template-columns: 1fr; gap: 12px; } }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    @media (max-width: 500px) { .grid-3 { grid-template-columns: 1fr; gap: 10px; } }
+
+    .section-title {
+      font-family: 'Teko', sans-serif;
+      font-size: 23px;
+      color: #38bdf8;
+      border-bottom: 2px solid #1e293b;
+      padding-bottom: 7px;
+      margin-bottom: 16px;
+      letter-spacing: 1px;
+    }
+
+    .form-group { margin-bottom: 13px; }
+    label { display: block; font-size: 13px; font-weight: 700; color: #94a3b8; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    input, select {
+      width: 100%;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #fff;
+      padding: 9px 13px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+    }
+    input:focus, select:focus { outline: none; border-color: #f59e0b; box-shadow: 0 0 10px rgba(245, 158, 11, 0.3); }
+
+    .btn {
+      font-family: 'Teko', sans-serif;
+      font-size: 21px;
+      letter-spacing: 1px;
+      background: #3b82f6;
+      color: #fff;
+      border: none;
+      padding: 9px 22px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 600;
+    }
+    .btn:hover { filter: brightness(1.12); box-shadow: 0 0 14px rgba(59, 130, 246, 0.5); }
+    .btn-danger { background: #dc2626; }
+    .btn-danger:hover { box-shadow: 0 0 14px rgba(220, 38, 38, 0.5); }
+    .btn-success { background: #22c55e; color: #090d16; }
+    .btn-success:hover { box-shadow: 0 0 14px rgba(34, 197, 94, 0.5); }
+    .btn-warning { background: #f59e0b; color: #090d16; }
+    .btn-warning:hover { box-shadow: 0 0 14px rgba(245, 158, 11, 0.5); }
+    .btn-sm { font-size: 16px; padding: 4px 12px; }
+
+    .score-controls { display: flex; align-items: center; gap: 14px; }
+    .score-display { font-family: 'Teko', sans-serif; font-size: 34px; color: #f59e0b; width: 46px; text-align: center; }
+
+    .team-card {
+      background: #162032;
+      padding: 14px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
+    .team-card.blue { border-left: 4px solid #3b82f6; }
+    .team-card.red { border-left: 4px solid #ef4444; }
+    .team-card label.color-blue { color: #60a5fa; }
+    .team-card label.color-red { color: #f87171; }
+
+    .draft-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+      background: #1e293b;
+      padding: 8px;
+      border-radius: 8px;
+      flex-wrap: wrap;
+    }
+    .draft-row span { font-family: 'Teko', sans-serif; font-size: 19px; color: #fbbf24; min-width: 46px; }
+    .draft-row input { flex: 1; min-width: 90px; padding: 6px; font-size: 14px; }
+    .draft-row select { flex: 1.2; min-width: 130px; padding: 6px; font-size: 14px; }
+
+    .actions-bar { margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
+
+    /* Scene control */
+    .scene-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+    .scene-btn {
+      font-family: 'Teko', sans-serif;
+      font-size: 21px;
+      letter-spacing: 1px;
+      padding: 16px 10px;
+      border-radius: 10px;
+      border: 2px solid #334155;
+      background: #1e293b;
+      color: #e2e8f0;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+    }
+    .scene-btn:hover { border-color: #38bdf8; box-shadow: 0 0 14px rgba(56, 189, 248, 0.4); }
+    .scene-btn.live { border-color: #22c55e; background: #16261c; }
+    .scene-btn.offline { opacity: 0.5; cursor: not-allowed; }
+
+    /* Live match */
+    .stat-box {
+      background: #162032;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+    .stat-box.blue { border-left: 4px solid #3b82f6; }
+    .stat-box.red { border-left: 4px solid #ef4444; }
+    .stat-line { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .stat-line .stat-val { font-family: 'Teko', sans-serif; font-size: 30px; min-width: 40px; text-align: center; }
+    .stat-box.blue .stat-val { color: #60a5fa; }
+    .stat-box.red .stat-val { color: #f87171; }
+
+    .ocr-panel { background: #162032; border-radius: 8px; padding: 14px; margin-bottom: 14px; }
+    .ocr-status { font-family: 'Teko'; font-size: 20px; letter-spacing: 1px; }
+    .ocr-status.running { color: #4ade80; }
+    .ocr-status.stopped { color: #94a3b8; }
+    .ocr-readout { font-size: 14px; font-weight: 700; color: #e2e8f0; margin-top: 6px; }
+    .ocr-readout .raw { color: #64748b; font-weight: 600; }
+    .ocr-readout .good { color: #4ade80; }
+    .ocr-readout .bad { color: #f87171; }
+
+    canvas { border: 1px solid #334155; border-radius: 8px; background: #0b0f1c; max-width: 100%; cursor: crosshair; display: block; }
+
+    .hotkey-hint {
+      background: #162032;
+      border: 1px dashed #334155;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 14px;
+    }
+    .hotkey-hint b { color: #fbbf24; font-family: 'Teko'; font-size: 15px; letter-spacing: 1px; }
+
+    .toast {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      background: #16a34a;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      opacity: 0;
+      transform: translateX(20px);
+      transition: all 0.3s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(0); }
+    .toast.err { background: #dc2626; }
+
+    .divider { border-top: 1px solid #1e293b; margin: 18px 0; }
+    .hint { font-size: 12.5px; color: #64748b; margin-top: 4px; }
+    .preset-btns { display: flex; gap: 8px; }
+    .preset-btn {
+      font-family: 'Teko', sans-serif;
+      font-size: 17px;
+      letter-spacing: 1px;
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .preset-btn:hover { border-color: #f59e0b; color: #fbbf24; }
+  </style>
+</head>
+<body>
+
+<header>
+      <h1>MLBB TOURNAMENT CONTROL PANEL</h1>
+      <div class="status-row">
+        <div class="live-status"><div class="dot green"></div>OVERLAY LIVE</div>
+        <div id="obsStatus" class="obs-status"><div class="dot gray"></div>OBS: ...</div>
+        <div class="diag-panel" style="display:none;">
+          <div class="diag-row"><span class="diag-label">WebSocket:</span><span class="diag-value" id="diagWsStatus">--</span></div>
+          <div class="diag-row"><span class="diag-label">Source:</span><span class="diag-value" id="diagSource">--</span></div>
+        </div>
+      </div>
+    </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="scene">Scene</button>
+    <button class="tab-btn" data-tab="scoreboard">Score</button>
+    <button class="tab-btn" data-tab="draft">Draft</button>
+    <button class="tab-btn" data-tab="livematch">Live Match</button>
+    <button class="tab-btn" data-tab="casters">Casters</button>
+    <button class="tab-btn" data-tab="mvp">MVP</button>
+  </div>
+
+  <!-- TAB: SCENE -->
+  <div id="tab-scene" class="panel active">
+    <div class="section-title">OBS Scene Control (one-click switching)</div>
+    <div class="scene-grid">
+      <button class="scene-btn" onclick="switchScene('INTRO / BREAK')">Intro / Break</button>
+      <button class="scene-btn live" onclick="switchScene('DRAFT')">Draft</button>
+      <button class="scene-btn" onclick="switchScene('BAN PHASE')">Ban Phase</button>
+      <button class="scene-btn live" onclick="switchScene('LIVE MATCH')">Live Match</button>
+      <button class="scene-btn" onclick="switchScene('TIMELINE')">Timeline</button>
+      <button class="scene-btn live" onclick="switchScene('CASTERS')">Casters</button>
+      <button class="scene-btn" onclick="switchScene('TEAM STATS')">Team Stats</button>
+      <button class="scene-btn live" onclick="switchScene('MVP')">MVP</button>
+      <button class="scene-btn" onclick="switchScene('DRAFT ANALYSIS')">Draft Analysis</button>
+      <button class="scene-btn" onclick="switchScene('PLAYER PROFILE')">Player Profile</button>
+      <button class="scene-btn" onclick="switchScene('BRB')">BRB</button>
+    </div>
+    <div class="hint" style="margin-top:12px;">Requires OBS WebSocket plugin enabled (Tools → WebSocket Server Settings → Enable) and the MLBB Tournament scene collection imported. This dock works even without it.</div>
+    <div class="actions-bar">
+      <button class="btn btn-warning" onclick="refreshOverlays()">Refresh All Overlays</button>
+      <div class="preset-btns">
+        <button class="preset-btn" onclick="setPreset('bo3')">BO3</button>
+        <button class="preset-btn" onclick="setPreset('bo5')">BO5</button>
+        <button class="preset-btn" onclick="setPreset('boot')">BO1</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: SCOREBOARD -->
+  <div id="tab-scoreboard" class="panel">
+    <div class="grid-2">
+      <div>
+        <div class="section-title">Tournament Settings</div>
+        <div class="form-group"><label>Tournament Name</label><input type="text" id="tournamentName" /></div>
+        <div class="form-group"><label>Match Stage</label><input type="text" id="matchStage" /></div>
+        <div class="grid-2">
+          <div class="form-group"><label>Format</label>
+            <select id="matchFormat">
+              <option value="BO1">BO1</option>
+              <option value="BO3">BO3</option>
+              <option value="BO5">BO5</option>
+              <option value="BO7">BO7</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Game #</label>
+            <select id="currentGame">
+              <option value="1">Game 1</option><option value="2">Game 2</option>
+              <option value="3">Game 3</option><option value="4">Game 4</option>
+              <option value="5">Game 5</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label>Scoreboard Status Text (optional)</label><input type="text" id="statusText" placeholder="LIVE MATCH" /></div>
+        <div class="actions-bar">
+          <button class="btn btn-warning" onclick="swapSides()">Swap Blue / Red Sides</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">Team Scores & Details</div>
+        <div class="team-card blue">
+          <label class="color-blue">Blue Team (Team A)</label>
+          <div class="grid-2">
+            <div class="form-group"><label>Name</label><input type="text" id="teamA_name" /></div>
+            <div class="form-group"><label>Logo URL</label><input type="text" id="teamA_logo" placeholder="https://... or /images/..." /></div>
+          </div>
+          <div class="form-group"><label>Score</label>
+            <div class="score-controls">
+              <button class="btn" onclick="adjustScore('A', -1)">-</button>
+              <div id="scoreA_val" class="score-display">0</div>
+              <button class="btn" onclick="adjustScore('A', 1)">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="team-card red">
+          <label class="color-red">Red Team (Team B)</label>
+          <div class="grid-2">
+            <div class="form-group"><label>Name</label><input type="text" id="teamB_name" /></div>
+            <div class="form-group"><label>Logo URL</label><input type="text" id="teamB_logo" placeholder="https://... or /images/..." /></div>
+          </div>
+          <div class="form-group"><label>Score</label>
+            <div class="score-controls">
+              <button class="btn btn-danger" onclick="adjustScore('B', -1)">-</button>
+              <div id="scoreB_val" class="score-display">0</div>
+              <button class="btn btn-danger" onclick="adjustScore('B', 1)">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="actions-bar">
+      <button class="btn btn-success" onclick="saveScoreboard()">Save & Broadcast</button>
+    </div>
+  </div>
+
+  <!-- TAB: DRAFT -->
+  <div id="tab-draft" class="panel">
+    <div class="grid-2" style="margin-bottom:18px;">
+      <div class="form-group"><label>Draft Phase Banner</label><input type="text" id="draftPhaseText" placeholder="e.g. BLUE TEAM BANNING" /></div>
+      <div class="grid-2">
+        <div class="form-group"><label>Timer (sec)</label><input type="number" id="draftTimer" min="0" max="300" /></div>
+        <div class="form-group"><label>Run Timer</label>
+          <select id="draftTimerRunning">
+            <option value="true">Running</option>
+            <option value="false">Paused</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group" style="max-width:220px;">
+      <label>Ban Slots This Game (applies to both teams)</label>
+      <select id="banCount" onchange="rebuildDraftUI()">
+        <option value="1">1 ban</option>
+        <option value="2">2 bans</option>
+        <option value="3">3 bans</option>
+        <option value="4">4 bans</option>
+        <option value="5">5 bans</option>
+      </select>
+      <div class="hint">MPL S4/5 style: change per game, e.g. 3 bans for tournament matches.</div>
+    </div>
+
+    <div class="grid-2">
+      <div>
+        <div class="section-title" style="color:#60a5fa;">Blue Team (Team A) Draft</div>
+        <label>Bans</label>
+        <div id="teamABansConfig"></div>
+        <label style="margin-top:14px;display:block;">Picks (5)</label>
+        <div id="teamAPicksConfig"></div>
+      </div>
+      <div>
+        <div class="section-title" style="color:#f87171;">Red Team (Team B) Draft</div>
+        <label>Bans</label>
+        <div id="teamBBansConfig"></div>
+        <label style="margin-top:14px;display:block;">Picks (5)</label>
+        <div id="teamBPicksConfig"></div>
+      </div>
+    </div>
+    <div class="actions-bar">
+      <button class="btn btn-success" onclick="saveDraft()">Save & Broadcast Draft</button>
+      <div style="margin-left:14px;">
+        <button class="btn btn-warning btn-sm" onclick="exportDraft()">Export Draft</button>
+        <button class="btn btn-sm btn-success" onclick="importDraft()">Import Draft</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: LIVE MATCH -->
+  <div id="tab-livematch" class="panel">
+    <div class="section-title">Auto Scoring (OCR from scrcpy feed via OBS)</div>
+    <div class="ocr-panel">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+        <span id="autoStatus" class="ocr-status stopped">AUTO: stopped</span>
+        <button id="autoToggleBtn" class="btn btn-success btn-sm" onclick="toggleAuto()">Start Auto</button>
+        <button class="btn btn-sm" onclick="runOcrTest()">Test OCR Now</button>
+        <button class="btn btn-sm" onclick="loadFrame()">Refresh Frame</button>
+      </div>
+      <div id="ocrReadout" class="ocr-readout">No readings yet.</div>
+      <div class="hint">Hotkeys (admin focused): <b>A</b> blue kill · <b>S</b> red kill · <b>Q</b> blue turret · <b>W</b> red turret · <b>G</b> end game. Auto mode wins over manual edits while running.</div>
+    </div>
+
+    <div class="section-title">OCR Calibration (drag the 3 boxes onto the HUD)</div>
+    <div class="grid-2">
+      <div>
+        <canvas id="calCanvas" width="960" height="432"></canvas>
+        <div class="hint">Yellow = match timer · Blue box = blue kills · Red box = red kills. Drag each box over the in-game HUD, boxes auto-save.</div>
+      </div>
+      <div class="ocr-panel">
+        <div class="ocr-readout" id="calReadout">Load a frame first (needs OBS + scrcpy running, LIVE MATCH scene with the phone feed visible).</div>
+        <div class="actions-bar">
+          <button class="btn btn-warning btn-sm" onclick="resetRegions()">Reset Regions to Defaults</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-title">Manual Match Control</div>
+    <div class="stat-box">
+      <label style="color:#fbbf24;">Match Clock</label>
+      <div class="stat-line" style="margin-top:8px;">
+        <input type="number" id="lmMinutes" min="0" max="99" style="max-width:90px;" /> :
+        <input type="number" id="lmSeconds" min="0" max="59" style="max-width:90px;" />
+        <button class="btn btn-sm" onclick="lmSetClock()">Set</button>
+        <button class="btn btn-success btn-sm" id="clockToggleBtn" onclick="lmToggleClock()">Start</button>
+        <button class="btn btn-danger btn-sm" onclick="lmResetClock()">Reset</button>
+        <span class="hint" style="margin:0;">When AUTO is on, the timer is read from the feed.</span>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="stat-box blue">
+        <label class="color-blue">Blue Team (Team A) Stats</label>
+        <div class="stat-line" style="margin-top:8px;">
+          <span>Kills</span>
+          <button class="btn btn-sm" onclick="lmAdjust('blue','kills',-1)">-</button>
+          <div id="lmBlueKills" class="stat-val">0</div>
+          <button class="btn btn-sm" onclick="lmAdjust('blue','kills',1)">+</button>
+          <span style="color:#64748b;">Turrets</span>
+          <button class="btn btn-sm" onclick="lmAdjust('blue','turrets',-1)">-</button>
+          <div id="lmBlueTurrets" class="stat-val">0</div>
+          <button class="btn btn-sm" onclick="lmAdjust('blue','turrets',1)">+</button>
+        </div>
+        <div class="form-group" style="margin-top:8px;"><label>Total Gold</label><input type="text" id="lmBlueGold" placeholder="14.2k" /></div>
+      </div>
+      <div class="stat-box red">
+        <label class="color-red">Red Team (Team B) Stats</label>
+        <div class="stat-line" style="margin-top:8px;">
+          <span>Kills</span>
+          <button class="btn btn-sm" onclick="lmAdjust('red','kills',-1)">-</button>
+          <div id="lmRedKills" class="stat-val">0</div>
+          <button class="btn btn-sm" onclick="lmAdjust('red','kills',1)">+</button>
+          <span style="color:#64748b;">Turrets</span>
+          <button class="btn btn-sm" onclick="lmAdjust('red','turrets',-1)">-</button>
+          <div id="lmRedTurrets" class="stat-val">0</div>
+          <button class="btn btn-sm" onclick="lmAdjust('red','turrets',1)">+</button>
+        </div>
+        <div class="form-group" style="margin-top:8px;"><label>Total Gold</label><input type="text" id="lmRedGold" placeholder="14.2k" /></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-title">Objective Events (Turtle / Lord banners)</div>
+    <div class="stat-box">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+        <label style="color:#fbbf24;margin:0;">Turtle:</label>
+        <button class="btn btn-sm" onclick="objectiveAction('turtle','blue')">Turtle Down — Blue</button>
+        <button class="btn btn-danger btn-sm" onclick="objectiveAction('turtle','red')">Turtle Down — Red</button>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:8px;">
+        <label style="color:#fbbf24;margin:0;">Lord:</label>
+        <button class="btn btn-sm" onclick="objectiveAction('lord','blue')">Lord Down — Blue</button>
+        <button class="btn btn-danger btn-sm" onclick="objectiveAction('lord','red')">Lord Down — Red</button>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:8px;">
+        <input type="checkbox" id="objectivesEnabled" style="width:22px;height:22px;" />
+        <label for="objectivesEnabled" style="margin:0;font-size:17px;color:#fbbf24;cursor:pointer;">Objective Trackers Enabled (auto warn/spawn on clock)</label>
+        <button class="btn btn-warning btn-sm" onclick="objectiveReset()">Reset Objective Cycle</button>
+      </div>
+      <div class="hint">Warn & spawn fire automatically from the match clock (turtle first spawn 2:00, lord 8:00). Click the team button when a turtle/lord is killed — the overlay shows a banner + countdown chips.</div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-title">Series Configuration</div>
+    <div style="margin-bottom:14px;">
+      <label>Series Format</label>
+      <select id="seriesFormat" onchange="updateSeriesConfig()">
+        <option value="BO1">BO1</option>
+        <option value="BO3">BO3</option>
+        <option value="BO5">BO5</option>
+        <option value="BO7">BO7</option>
+      </select>
+      <span class="hint">First to win <span id="seriesWinThreshold">4</span> games</span>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <button class="btn btn-sm" onclick="seriesNextGame()">Next Game →</button>
+      <button class="btn btn-sm btn-danger" onclick="seriesResetSeries()">Reset Series</button>
+      <button class="btn btn-sm btn-success" onclick="seriesRecordWin('A')">Blue Wins Game</button>
+      <button class="btn btn-sm btn-danger" onclick="seriesRecordWin('B')">Red Wins Game</button>
+    </div>
+    <div style="margin-top:12px;font-size:13px;color:#64748b;">
+      Game: <span id="seriesCurrentGame">1</span> / <span id="seriesMaxGames">1</span> • 
+      <span id="seriesWinner" style="display:none;color:#fbbf24;"></span> wins the series
+    </div>
+
+    <div class="actions-bar">
+      <button class="btn btn-success" onclick="saveLiveMatch()">Save & Broadcast Live Match</button>
+      <button class="btn btn-warning" onclick="endGame()">End Game (auto series score)</button>
+    </div>
+  </div>
+
+  <!-- TAB: CASTERS -->
+  <div id="tab-casters" class="panel">
+    <div class="section-title">Casters, Analyst & Ticker</div>
+    <div class="grid-3">
+      <div>
+        <div class="form-group"><label>Caster 1</label><input type="text" id="caster1_name" /></div>
+        <div class="form-group"><label>Handle</label><input type="text" id="caster1_handle" /></div>
+      </div>
+      <div>
+        <div class="form-group"><label>Caster 2</label><input type="text" id="caster2_name" /></div>
+        <div class="form-group"><label>Handle</label><input type="text" id="caster2_handle" /></div>
+      </div>
+      <div>
+        <div class="form-group"><label>Analyst</label><input type="text" id="analyst_name" /></div>
+        <div class="form-group"><label>Handle</label><input type="text" id="analyst_handle" /></div>
+      </div>
+    </div>
+    <div class="form-group"><label>Ticker Message</label><input type="text" id="tickerMessage" /></div>
+    <div class="form-group" style="display:flex;align-items:center;gap:12px;">
+      <input type="checkbox" id="showLowerThird" style="width:22px;height:22px;" />
+      <label for="showLowerThird" style="margin:0;font-size:17px;color:#fbbf24;cursor:pointer;">Show Caster Lower Thirds</label>
+    </div>
+    <div class="actions-bar">
+      <button class="btn btn-success" onclick="saveCasters()">Save & Broadcast</button>
+    </div>
+  </div>
+
+  <!-- TAB: MVP -->
+  <div id="tab-mvp" class="panel">
+    <div class="section-title">Post-Match MVP Announcement</div>
+    <div class="grid-2">
+      <div>
+        <div class="form-group"><label>Player Name</label><input type="text" id="mvpPlayer" /></div>
+        <div class="form-group"><label>Team Tag</label><input type="text" id="mvpTeam" /></div>
+        <div class="form-group"><label>Hero Played</label><select id="mvpHeroSelect"></select></div>
+      </div>
+      <div>
+        <div class="form-group"><label>K / D / A</label><input type="text" id="mvpKda" placeholder="10 / 1 / 8" /></div>
+        <div class="form-group"><label>Net Worth / Gold</label><input type="text" id="mvpGold" placeholder="14.2K" /></div>
+        <div class="form-group"><label>Damage</label><input type="text" id="mvpDamage" placeholder="85,420" /></div>
+      </div>
+    </div>
+    <div class="form-group" style="display:flex;align-items:center;gap:12px;">
+      <input type="checkbox" id="showMvpCard" style="width:22px;height:22px;" />
+      <label for="showMvpCard" style="margin:0;font-size:17px;color:#fbbf24;cursor:pointer;">Show MVP Card on Stream</label>
+    </div>
+    <div class="actions-bar">
+      <button class="btn btn-success" onclick="saveMvp()">Save & Broadcast MVP</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    let globalData = {};
+    let heroesList = [];
+
+    const SPELLS = ['', 'Arrival', 'Aegis', 'Execute', 'Flicker', 'Inspire', 'Petrify', 'Purify', 'Retribution', 'Revitalize', 'Sprint', 'Vengeance', 'Weaken'];
+
+    // ---------- UI helpers ----------
+    function toast(msg, isErr) {
+      const t = document.getElementById('toast');
+      t.innerText = msg;
+      t.classList.toggle('err', !!isErr);
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    function setPreset(format) {
+      const formatMap = { bo3: 'BO3', bo5: 'BO5', boot: 'BO1' };
+      const gamesMap = { bo3: 3, bo5: 5, boot: 1 };
+      const formatValue = formatMap[format] || 'BO1';
+      const games = gamesMap[format] || 1;
+      document.getElementById('matchFormat').value = formatValue;
+      document.getElementById('currentGame').value = 1;
+      // Set ban count based on format (max 5 bans)
+      document.getElementById('banCount').value = Math.min(5, games + 2);
+      rebuildDraftUI();
+      toast('Preset applied: ' + formatValue + ' (' + games + '-game)');
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+      document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tab));
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(b => {
+      b.addEventListener('click', () => switchTab(b.dataset.tab));
+    });
+
+    document.getElementById('objectivesEnabled').addEventListener('change', (e) => {
+      objectiveToggle(e.target.checked);
+    });
+
+    // ---------- OBS scene control ----------
+    async function refreshOBSStatus() {
+      try {
+        const s = await (await fetch('/api/obs/status')).json();
+        const el = document.getElementById('obsStatus');
+        el.className = 'obs-status';
+        el.innerHTML = s.connected
+          ? '<div class="dot blue"></div>OBS CONNECTED'
+          : (s.pluginEnabled
+            ? '<div class="dot gray"></div>OBS: plugin on, not connected'
+            : '<div class="dot gray"></div>OBS: plugin off');
+      } catch (_) {}
+    }
+
+    async function switchScene(scene) {
+      try {
+        const r = await fetch('/api/obs/scene', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ scene }),
+        });
+        const j = await r.json();
+        if (j.success) toast('Switched to ' + scene);
+        else toast('OBS: ' + j.error, true);
+      } catch (_) { toast('Scene switch failed', true); }
+      refreshOBSStatus();
+    }
+
+    async function refreshOverlays() {
+      const r = await fetch('/api/obs/refresh-sources', { method: 'POST' });
+      toast((await r.json()).success ? 'Overlays refreshed' : 'Refresh done (no OBS)');
+    }
+
+    // ---------- Data loading ----------
+    async function loadAssets() {
+      heroesList = await (await fetch('/api/heroes')).json();
+      const sel = document.getElementById('mvpHeroSelect');
+      sel.innerHTML = '<option value="">— None —</option>';
+      heroesList.forEach(h => {
+        const opt = document.createElement('option');
+        opt.value = h.name;
+        opt.innerText = `${h.name} (${h.role})`;
+        sel.appendChild(opt);
+      });
+    }
+
+    function heroOptions() {
+      let out = '<option value="">—</option>';
+      heroesList.forEach(h => { out += `<option value="${h.id}">${h.name} (${h.role})</option>`; });
+      return out;
+    }
+
+    function spellOptions(selected) {
+      return SPELLS.map(s => `<option value="${s}" ${s === selected ? 'selected' : ''}>${s || '—'}</option>`).join('');
+    }
+
+    function roleOptions(selected) {
+      return ['EXP', 'Jungle', 'Mid', 'Gold', 'Roam']
+        .map(r => `<option value="${r}" ${r === selected ? 'selected' : ''}>${r}</option>`).join('');
+    }
+
+    function banCount() {
+      return Math.min(5, Math.max(1, parseInt(document.getElementById('banCount').value) || 3));
+    }
+
+    function rebuildDraftUI() {
+      const opts = heroOptions();
+      const n = banCount();
+      let htmlA = '', htmlB = '';
+      for (let i = 0; i < n; i++) htmlA += `<div class="draft-row"><span>BAN ${i + 1}</span><select id="banA_${i}">${opts}</select></div>`;
+      for (let i = 0; i < n; i++) htmlB += `<div class="draft-row"><span>BAN ${i + 1}</span><select id="banB_${i}">${opts}</select></div>`;
+
+      let picksA = '', picksB = '';
+      for (let i = 0; i < 5; i++) {
+        picksA += `<div class="draft-row"><span>P${i + 1}</span>
+          <select id="pickA_hero_${i}">${opts}</select>
+          <input type="text" id="pickA_player_${i}" placeholder="IGN">
+          <select id="pickA_role_${i}">${roleOptions()}</select>
+          <select id="pickA_spell_${i}" style="min-width:110px;">${spellOptions()}</select>
+          <input type="text" id="pickA_emblem_${i}" placeholder="Emblem" style="min-width:80px;"></div>`;
+        picksB += `<div class="draft-row"><span>P${i + 1}</span>
+          <select id="pickB_hero_${i}">${opts}</select>
+          <input type="text" id="pickB_player_${i}" placeholder="IGN">
+          <select id="pickB_role_${i}">${roleOptions()}</select>
+          <select id="pickB_spell_${i}" style="min-width:110px;">${spellOptions()}</select>
+          <input type="text" id="pickB_emblem_${i}" placeholder="Emblem" style="min-width:80px;"></div>`;
+      }
+
+      document.getElementById('teamABansConfig').innerHTML = htmlA;
+      document.getElementById('teamBBansConfig').innerHTML = htmlB;
+      document.getElementById('teamAPicksConfig').innerHTML = picksA;
+      document.getElementById('teamBPicksConfig').innerHTML = picksB;
+      populateDraftFromData();
+    }
+
+    function populateDraftFromData() {
+      const data = globalData;
+      const n = banCount();
+      const loadBans = (prefix, bans) => {
+        (bans || []).forEach((id, i) => { if (i < n) { const el = document.getElementById(`${prefix}${i}`); if (el) el.value = id || ''; } });
+      };
+      const loadPicks = (prefix, picks) => {
+        (picks || []).forEach((p, i) => {
+          const g = (id) => document.getElementById(`pick${prefix}_${id}_${i}`);
+          if (!p) return;
+          if (g('hero')) g('hero').value = p.hero || '';
+          if (g('player')) g('player').value = p.player || '';
+          if (g('role')) g('role').value = p.role || 'EXP';
+          if (g('spell')) g('spell').value = p.spell || '';
+          if (g('emblem')) g('emblem').value = p.emblem || '';
+        });
+      };
+      loadBans('banA_', data.teamA && data.teamA.bans);
+      loadBans('banB_', data.teamB && data.teamB.bans);
+      loadPicks('A', data.teamA && data.teamA.picks);
+      loadPicks('B', data.teamB && data.teamB.picks);
+    }
+
+    // ---------- Populate form ----------
+    function populateForm(data) {
+      globalData = data;
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+
+      set('tournamentName', data.tournamentName);
+      set('matchStage', data.matchStage);
+      set('matchFormat', data.matchFormat);
+      set('currentGame', data.currentGame);
+      set('statusText', data.statusText);
+      set('banCount', data.banCount || 3);
+
+      if (data.teamA) {
+        set('teamA_name', data.teamA.name);
+        set('teamA_logo', data.teamA.logo);
+        document.getElementById('scoreA_val').innerText = data.teamA.score || 0;
+      }
+      if (data.teamB) {
+        set('teamB_name', data.teamB.name);
+        set('teamB_logo', data.teamB.logo);
+        document.getElementById('scoreB_val').innerText = data.teamB.score || 0;
+      }
+
+      if (data.draftState) {
+        set('draftPhaseText', data.draftState.phaseText);
+        set('draftTimer', data.draftState.timerSeconds);
+        set('draftTimerRunning', data.draftState.isTimerRunning ? 'true' : 'false');
+      }
+
+      const lm = data.liveMatch || {};
+      set('lmMinutes', Math.floor((lm.timerSeconds || 0) / 60));
+      set('lmSeconds', (lm.timerSeconds || 0) % 60);
+      const objEl = document.getElementById('objectivesEnabled');
+      if (objEl && data.objectives) objEl.checked = data.objectives.enabled !== false;
+      document.getElementById('lmBlueKills').innerText = (lm.blue && lm.blue.kills) || 0;
+      document.getElementById('lmRedKills').innerText = (lm.red && lm.red.kills) || 0;
+      document.getElementById('lmBlueTurrets').innerText = (lm.blue && lm.blue.turrets) || 0;
+      document.getElementById('lmRedTurrets').innerText = (lm.red && lm.red.turrets) || 0;
+      set('lmBlueGold', lm.blue && lm.blue.gold);
+      set('lmRedGold', lm.red && lm.red.gold);
+      updateClockBtn(lm.timerRunning);
+      updateAutoUI(data.autoScore && data.autoScore.enabled);
+
+      if (data.casters) {
+        const c = data.casters;
+        set('caster1_name', c.caster1 && c.caster1.name);
+        set('caster1_handle', c.caster1 && c.caster1.handle);
+        set('caster2_name', c.caster2 && c.caster2.name);
+        set('caster2_handle', c.caster2 && c.caster2.handle);
+        set('analyst_name', c.analyst && c.analyst.name);
+        set('analyst_handle', c.analyst && c.analyst.handle);
+        set('tickerMessage', c.tickerMessage);
+        document.getElementById('showLowerThird').checked = !!(c.showCards !== undefined ? c.showCards : c.showLowerThird);
+      }
+
+      if (data.mvp) {
+        const m = data.mvp;
+        set('mvpPlayer', m.playerName);
+        set('mvpTeam', m.teamTag);
+        set('mvpHeroSelect', m.heroName);
+        set('mvpKda', m.kda);
+        set('mvpGold', m.gold);
+        set('mvpDamage', m.damage);
+        document.getElementById('showMvpCard').checked = !!m.showCard;
+      }
+
+      populateDraftFromData();
+
+      try {
+        loadCalConfig((data.autoScore && data.autoScore.regions) || null);
+      } catch (_) {}
+    }
+
+    // ---------- Save / update ----------
+    async function sendUpdate(payload) {
+      try {
+        const res = await fetch('/api/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const json = await res.json();
+        if (json.success) globalData = json.data;
+        return json.success;
+      } catch (e) { return false; }
+    }
+
+    function adjustScore(team, delta) {
+      const el = document.getElementById(team === 'A' ? 'scoreA_val' : 'scoreB_val');
+      let cur = parseInt(el.innerText) || 0;
+      cur = Math.max(0, cur + delta);
+      el.innerText = cur;
+      if (team === 'A') globalData.teamA.score = cur; else globalData.teamB.score = cur;
+      sendUpdate(globalData);
+    }
+
+    async function saveScoreboard() {
+      globalData.tournamentName = document.getElementById('tournamentName').value;
+      globalData.matchStage = document.getElementById('matchStage').value;
+      globalData.matchFormat = document.getElementById('matchFormat').value;
+      globalData.currentGame = parseInt(document.getElementById('currentGame').value) || 1;
+      globalData.statusText = document.getElementById('statusText').value;
+
+      globalData.teamA.name = document.getElementById('teamA_name').value;
+      globalData.teamA.logo = document.getElementById('teamA_logo').value;
+      globalData.teamA.score = parseInt(document.getElementById('scoreA_val').innerText) || 0;
+
+      globalData.teamB.name = document.getElementById('teamB_name').value;
+      globalData.teamB.logo = document.getElementById('teamB_logo').value;
+      globalData.teamB.score = parseInt(document.getElementById('scoreB_val').innerText) || 0;
+
+      (await sendUpdate(globalData)) ? toast('Scoreboard saved') : toast('Save failed', true);
+    }
+
+    async function swapSides() {
+      try {
+        const res = await fetch('/api/swap-sides', { method: 'POST' });
+        const json = await res.json();
+        if (json.success) { populateForm(json.data); toast('Sides swapped'); }
+      } catch (_) { toast('Swap failed', true); }
+    }
+
+    async function saveDraft() {
+      if (!globalData.draftState) globalData.draftState = {};
+      globalData.banCount = banCount();
+      globalData.draftState.phaseText = document.getElementById('draftPhaseText').value;
+      globalData.draftState.timerSeconds = parseInt(document.getElementById('draftTimer').value) || 0;
+      globalData.draftState.isTimerRunning = document.getElementById('draftTimerRunning').value === 'true';
+
+      const n = banCount();
+      ['A', 'B'].forEach(side => {
+        if (!globalData['team' + side].bans) globalData['team' + side].bans = [];
+        if (!globalData['team' + side].picks) globalData['team' + side].picks = [];
+        for (let i = 0; i < n; i++) {
+          globalData['team' + side].bans[i] = document.getElementById(`ban${side}_${i}`).value;
+          if (globalData['team' + side].bans.length > n) globalData['team' + side].bans = globalData['team' + side].bans.slice(0, n);
+        }
+        for (let i = 0; i < 5; i++) {
+          globalData['team' + side].picks[i] = {
+            hero: document.getElementById(`pick${side}_hero_${i}`).value,
+            player: document.getElementById(`pick${side}_player_${i}`).value,
+            role: document.getElementById(`pick${side}_role_${i}`).value,
+            spell: document.getElementById(`pick${side}_spell_${i}`).value,
+            emblem: document.getElementById(`pick${side}_emblem_${i}`).value,
+          };
+        }
+      });
+
+      (await sendUpdate(globalData)) ? toast('Draft saved') : toast('Save failed', true);
+    }
+
+    function exportDraft() {
+      const data = globalData;
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'mlbb-draft-export.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importDraft() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = async e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async () => {
+          try {
+            const draft = JSON.parse(reader.result);
+            const res = await fetch('/api/draft/import', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ draft }),
+            });
+            const j = await res.json();
+            if (j.success) {
+              toast('Draft imported successfully');
+              // Refresh the UI
+              rebuildDraftUI();
+              populateForm(await (await fetch('/api/data')).json());
+            } else {
+              toast(j.error || 'Import failed', true);
+            }
+          } catch (err) {
+            toast('Invalid JSON file', true);
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+
+    // ---------- Live match ----------
+    function updateClockBtn(running) {
+      const btn = document.getElementById('clockToggleBtn');
+      btn.innerText = running ? 'Pause' : 'Start';
+      btn.className = running ? 'btn btn-warning btn-sm' : 'btn btn-success btn-sm';
+    }
+
+    function updateAutoUI(enabled) {
+      const el = document.getElementById('autoStatus');
+      const btn = document.getElementById('autoToggleBtn');
+      el.className = 'ocr-status ' + (enabled ? 'running' : 'stopped');
+      el.innerText = enabled ? 'AUTO: active' : 'AUTO: stopped';
+      btn.innerText = enabled ? 'Stop Auto' : 'Start Auto';
+      btn.className = enabled ? 'btn btn-danger btn-sm' : 'btn btn-success btn-sm';
+    }
+
+    async function toggleAuto() {
+      const enabled = globalData.autoScore && globalData.autoScore.enabled;
+      const res = await fetch(enabled ? '/api/auto/stop' : '/api/auto/start', { method: 'POST' });
+      const j = await res.json();
+      if (j.success) {
+        if (globalData.autoScore) globalData.autoScore.enabled = !enabled;
+        updateAutoUI(!enabled);
+        refreshOBSStatus();
+      }
+    }
+
+    async function runOcrTest() {
+      const out = document.getElementById('ocrReadout');
+      try {
+        const res = await fetch('/api/auto/test', { method: 'POST' });
+        const j = await res.json();
+        if (!j.success) { out.innerText = 'OCR test failed: ' + (j.error || 'unknown'); return; }
+        const r = j.raw || {};
+        const v = j.parsed || {};
+        out.innerHTML = `<div><span class="good">Timer</span> <span class="raw">"${r.timer || ''}"</span> → ${v.timer !== null ? v.timer + 's (auto-applied)' : '<span class="bad">no read</span>'}</div>
+          <div><span class="good">Blue kills</span> <span class="raw">"${r.blueKills || ''}"</span> → ${v.blueKills !== null ? v.blueKills : '<span class="bad">no read</span>'}</div>
+          <div><span class="good">Red kills</span> <span class="raw">"${r.redKills || ''}"</span> → ${v.redKills !== null ? v.redKills : '<span class="bad">no read</span>'}</div>`;
+      } catch (e) {
+        out.innerText = 'OCR test error: ' + e.message;
+      }
+    }
+
+    function lmAdjust(side, field, delta) {
+      const lm = globalData.liveMatch || (globalData.liveMatch = {});
+      const team = lm[side] || (lm[side] = {});
+      team[field] = Math.max(0, (team[field] || 0) + delta);
+      document.getElementById(side === 'blue' ? 'lmBlueKills' : 'lmRedKills').innerText = team.kills || 0;
+      document.getElementById(side === 'blue' ? 'lmBlueTurrets' : 'lmRedTurrets').innerText = team.turrets || 0;
+      sendUpdate(globalData);
+    }
+
+    function lmSetClock() {
+      const lm = globalData.liveMatch || (globalData.liveMatch = {});
+      const mins = parseInt(document.getElementById('lmMinutes').value) || 0;
+      const secs = parseInt(document.getElementById('lmSeconds').value) || 0;
+      lm.timerSeconds = mins * 60 + secs;
+      sendUpdate(globalData);
+    }
+
+    function lmToggleClock() {
+      const lm = globalData.liveMatch || (globalData.liveMatch = {});
+      lm.timerRunning = !lm.timerRunning;
+      if (lm.timerRunning && lm.timerSeconds === undefined) lm.timerSeconds = 0;
+      lm.timerSeconds = lm.timerSeconds || 0;
+      updateClockBtn(lm.timerRunning);
+      sendUpdate(globalData);
+    }
+
+    function lmResetClock() {
+      const lm = globalData.liveMatch || (globalData.liveMatch = {});
+      lm.timerSeconds = 0;
+      lm.timerRunning = false;
+      document.getElementById('lmMinutes').value = 0;
+      document.getElementById('lmSeconds').value = 0;
+      updateClockBtn(false);
+      sendUpdate(globalData);
+    }
+
+    async function saveLiveMatch() {
+      const lm = globalData.liveMatch || (globalData.liveMatch = {});
+      lm.timerSeconds = (parseInt(document.getElementById('lmMinutes').value) || 0) * 60 + (parseInt(document.getElementById('lmSeconds').value) || 0);
+      lm.blue = lm.blue || {};
+      lm.red = lm.red || {};
+      lm.blue.gold = document.getElementById('lmBlueGold').value;
+      lm.red.gold = document.getElementById('lmRedGold').value;
+      (await sendUpdate(globalData)) ? toast('Live Match saved') : toast('Save failed', true);
+    }
+
+    async function objectiveAction(type, team) {
+      try {
+        const res = await fetch('/api/objectives/action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type, team }),
+        });
+        const j = await res.json();
+        toast(j.success ? (type.toUpperCase() + ' slain by ' + team) : (j.error || 'Objective action failed'), !j.success);
+        refreshOBSStatus();
+      } catch (_) { toast('Objective action failed', true); }
+    }
+
+    async function objectiveReset() {
+      try {
+        const j = await (await fetch('/api/objectives/reset', { method: 'POST' })).json();
+        toast(j.success ? 'Objective cycle reset' : 'Reset failed', !j.success);
+      } catch (_) { toast('Reset failed', true); }
+    }
+
+    async function objectiveToggle(enabled) {
+      await fetch('/api/objectives/toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled }),
+      });
+    }
+
+    function updateSeriesConfig() {
+      const format = document.getElementById('seriesFormat').value;
+      const thresholdMap = { BO1: 1, BO3: 2, BO5: 3, BO7: 4 };
+      const threshold = thresholdMap[format] || 1;
+      document.getElementById('seriesWinThreshold').innerText = threshold;
+    }
+
+    function seriesNextGame() {
+      fetch('/api/objectives/game', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'next' }) })
+        .then(r => r.json())
+        .then(j => {
+          if (j.success) {
+            document.getElementById('seriesCurrentGame').innerText = j.currentGame;
+            document.getElementById('seriesMaxGames').innerText = j.series.games;
+            if (j.series.wonBy) {
+              document.getElementById('seriesWinner').style.display = 'inline';
+              document.getElementById('seriesWinner').innerText = j.series.wonBy + ' leads series';
+            } else {
+              document.getElementById('seriesWinner').style.display = 'none';
+            }
+            toast('Game ' + j.currentGame + ' started');
+          } else {
+            toast(j.error || 'Failed', true);
+          }
+        })
+        .catch(_ => toast('Failed', true));
+    }
+
+    function seriesResetSeries() {
+      fetch('/api/objectives/game', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'reset' }) })
+        .then(r => r.json())
+        .then(j => {
+          if (j.success) {
+            document.getElementById('seriesCurrentGame').innerText = j.currentGame;
+            document.getElementById('seriesMaxGames').innerText = j.series.games;
+            document.getElementById('seriesWinner').style.display = 'none';
+            toast('Series reset');
+          } else {
+            toast(j.error || 'Failed', true);
+          }
+        })
+        .catch(_ => toast('Failed', true));
+    }
+
+    function seriesRecordWin(winner) {
+      fetch('/api/objectives/win', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ winner }) })
+        .then(r => r.json())
+        .then(j => {
+          if (j.success) {
+            document.getElementById('seriesWinner').innerText = j.winner + ' wins series!';
+            document.getElementById('seriesWinner').style.display = 'inline';
+            toast('Series won by ' + j.winner);
+          } else {
+            toast(j.error || 'Failed', true);
+          }
+        })
+        .catch(_ => toast('Failed', true));
+    }
+
+    function endGame() {
+      const winner = prompt('Game over! Who won? [A] = Blue/' + (globalData.teamA && globalData.teamA.name) + '  [B] = Red/' + (globalData.teamB && globalData.teamB.name));
+      if (!winner) return;
+      const w = winner.trim().toUpperCase();
+      if (w === 'A') globalData.teamA.score = (globalData.teamA.score || 0) + 1;
+      else if (w === 'B') globalData.teamB.score = (globalData.teamB.score || 0) + 1;
+      else { toast('Invalid input — cancel?') && endGame(); return; }
+      globalData.currentGame = (globalData.currentGame || 1) + 1;
+      const lm = globalData.liveMatch || (globalData.liveMatch = {});
+      lm.timerSeconds = 0;
+      lm.timerRunning = false;
+      lm.blue = lm.blue || {};
+      lm.red = lm.red || {};
+      lm.blue.kills = 0;
+      lm.red.kills = 0;
+      lm.blue.turrets = 0;
+      lm.red.turrets = 0;
+      lm.blue.gold = '0';
+      lm.red.gold = '0';
+      document.getElementById('lmMinutes').value = 0;
+      document.getElementById('lmSeconds').value = 0;
+      updateClockBtn(false);
+      sendUpdate(globalData).then(() => toast('Winner recorded: ' + (w === 'A' ? globalData.teamA.name : globalData.teamB.name)));
+    }
+
+    // ---------- OCR calibration canvas ----------
+    let calFrame = null;
+    let calRegions = null;
+    let calActive = null;
+
+    function resetRegions() {
+      calRegions = {
+        timer: { x: 0.47, y: 0.052, w: 0.075, h: 0.035 },
+        blueKills: { x: 0.29, y: 0.052, w: 0.05, h: 0.035 },
+        redKills: { x: 0.66, y: 0.052, w: 0.05, h: 0.035 },
+      };
+      saveCalConfig().then(drawCal);
+      document.getElementById('calReadout').innerText = 'Regions reset to landscape defaults. Drag boxes onto the HUD in the frame.';
+    }
+
+    function loadCalConfig(regions) {
+      calRegions = regions || calRegions || {
+        timer: { x: 0.47, y: 0.052, w: 0.075, h: 0.035 },
+        blueKills: { x: 0.29, y: 0.052, w: 0.05, h: 0.035 },
+        redKills: { x: 0.66, y: 0.052, w: 0.05, h: 0.035 },
+      };
+    }
+
+    async function saveCalConfig() {
+      if (!calRegions) return;
+      try {
+        await fetch('/api/auto/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ regions: calRegions }),
+        });
+      } catch (_) {}
+    }
+
+    async function loadFrame() {
+      const out = document.getElementById('calReadout');
+      try {
+        const res = await fetch('/api/auto/frame', { method: 'POST' });
+        const j = await res.json();
+        if (!j.success) { out.innerText = 'Frame capture failed: ' + (j.error || 'Is OBS running with the scrcpy feed?'); return; }
+        calFrame = { dataUrl: j.dataUrl, width: j.width, height: j.height };
+        drawCal();
+        out.innerText = `Frame captured: ${j.width}×${j.height}. Drag the boxes onto the in-game HUD.`;
+      } catch (e) {
+        out.innerText = 'Frame capture error: ' + e.message;
+      }
+    }
+
+    function drawCal() {
+      const canvas = document.getElementById('calCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (!calFrame) {
+        ctx.fillStyle = '#334155';
+        ctx.font = '18px Rajdhani';
+        ctx.fillText('No frame yet — click "Refresh Frame"', 30, 40);
+        return;
+      }
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+        const w = img.width * scale, h = img.height * scale;
+        const ox = (canvas.width - w) / 2, oy = (canvas.height - h) / 2;
+        ctx.drawImage(img, ox, oy, w, h);
+        const colors = { timer: '#fbbf24', blueKills: '#3b82f6', redKills: '#ef4444' };
+        const labels = { timer: 'TIMER', blueKills: 'BLUE KILLS', redKills: 'RED KILLS' };
+        for (const key of ['timer', 'blueKills', 'redKills']) {
+          const r = calRegions[key] || { x: 0.5, y: 0.05, w: 0.06, h: 0.03 };
+          const x = ox + r.x * w, y = oy + r.y * h, bw = r.w * w, bh = r.h * h;
+          ctx.strokeStyle = colors[key];
+          ctx.lineWidth = 2;
+          ctx.setLineDash([6, 4]);
+          ctx.strokeRect(x, y, bw, bh);
+          ctx.setLineDash([]);
+          ctx.fillStyle = colors[key];
+          ctx.font = 'bold 13px Rajdhani';
+          ctx.fillText(labels[key], x, y - 6);
+        }
+        calScale = { scale, ox, oy, w, h };
+      };
+      img.src = calFrame.dataUrl;
+    }
+
+    let calScale = null;
+
+    function calPoint(e) {
+      const canvas = document.getElementById('calCanvas');
+      const rect = canvas.getBoundingClientRect();
+      const px = (e.clientX - rect.left) * (canvas.width / rect.width);
+      const py = (e.clientY - rect.top) * (canvas.height / rect.height);
+      return { px, py };
+    }
+
+    function hitRegion(p) {
+      if (!calScale) return null;
+      const { ox, oy, w, h } = calScale;
+      for (const key of ['timer', 'blueKills', 'redKills']) {
+        const r = calRegions[key];
+        const x = ox + r.x * w, y = oy + r.y * h, bw = r.w * w, bh = r.h * h;
+        if (p.px >= x - 8 && p.px <= x + bw + 8 && p.py >= y - 8 && p.py <= y + bh + 8) return key;
+      }
+      return null;
+    }
+
+    document.getElementById('calCanvas').addEventListener('mousedown', (e) => {
+      calActive = hitRegion(calPoint(e));
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (!calActive || !calScale) return;
+      const p = calPoint(e);
+      const { ox, oy, w, h } = calScale;
+      const r = calRegions[calActive];
+      r.x = Math.min(0.98, Math.max(0, (p.px - ox) / w));
+      r.y = Math.min(0.97, Math.max(0, (p.py - oy) / h));
+      drawCal();
+    });
+    document.addEventListener('mouseup', async () => {
+      if (calActive) {
+        calActive = null;
+        await saveCalConfig();
+        toast('Regions saved');
+      }
+    });
+
+    // ---------- Hotkeys ----------
+    document.addEventListener('keydown', (e) => {
+      const tag = (e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'select' || tag === 'textarea') return;
+      const lm = globalData.liveMatch || (globalData.liveMatch = {});
+      const key = e.key.toLowerCase();
+      if (key === 'a') { lm.blue = lm.blue || {}; lm.blue.kills = (lm.blue.kills || 0) + 1; document.getElementById('lmBlueKills').innerText = lm.blue.kills; sendUpdate(globalData); }
+      else if (key === 's') { lm.red = lm.red || {}; lm.red.kills = (lm.red.kills || 0) + 1; document.getElementById('lmRedKills').innerText = lm.red.kills; sendUpdate(globalData); }
+      else if (key === 'q') { lm.blue = lm.blue || {}; lm.blue.turrets = (lm.blue.turrets || 0) + 1; document.getElementById('lmBlueTurrets').innerText = lm.blue.turrets; sendUpdate(globalData); }
+      else if (key === 'w') { lm.red = lm.red || {}; lm.red.turrets = (lm.red.turrets || 0) + 1; document.getElementById('lmRedTurrets').innerText = lm.red.turrets; sendUpdate(globalData); }
+      else if (key === 'g') { endGame(); }
+    });
+
+    async function saveCasters() {
+      if (!globalData.casters) globalData.casters = {};
+      globalData.casters.caster1 = {
+        name: document.getElementById('caster1_name').value,
+        handle: document.getElementById('caster1_handle').value,
+      };
+      globalData.casters.caster2 = {
+        name: document.getElementById('caster2_name').value,
+        handle: document.getElementById('caster2_handle').value,
+      };
+      globalData.casters.analyst = {
+        name: document.getElementById('analyst_name').value,
+        handle: document.getElementById('analyst_handle').value,
+      };
+      globalData.casters.tickerMessage = document.getElementById('tickerMessage').value;
+      globalData.casters.showLowerThird = document.getElementById('showLowerThird').checked;
+      globalData.casters.showCards = document.getElementById('showLowerThird').checked;
+
+      (await sendUpdate(globalData)) ? toast('Casters saved') : toast('Save failed', true);
+    }
+
+    async function saveMvp() {
+      if (!globalData.mvp) globalData.mvp = {};
+      globalData.mvp.playerName = document.getElementById('mvpPlayer').value;
+      globalData.mvp.teamTag = document.getElementById('mvpTeam').value;
+      globalData.mvp.heroName = document.getElementById('mvpHeroSelect').value;
+      globalData.mvp.kda = document.getElementById('mvpKda').value;
+      globalData.mvp.gold = document.getElementById('mvpGold').value;
+      globalData.mvp.damage = document.getElementById('mvpDamage').value;
+      globalData.mvp.showCard = document.getElementById('showMvpCard').checked;
+
+      (await sendUpdate(globalData)) ? toast('MVP saved') : toast('Save failed', true);
+    }
+
+    // ---------- Init ----------
+    async function init() {
+      await loadAssets();
+      rebuildDraftUI();
+      populateForm(await (await fetch('/api/data')).json());
+      refreshOBSStatus();
+      setInterval(refreshOBSStatus, 5000);
+
+      const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}`);
+      ws.onmessage = (e) => {
+        try {
+          const m = JSON.parse(e.data);
+          if (m.type === 'INIT' || m.type === 'UPDATE') {
+            globalData = m.data;
+            const el = document.getElementById('autoStatus');
+            if (el) updateAutoUI(!!(m.data.autoScore && m.data.autoScore.enabled));
+            const lblEl = document.getElementById('clockToggleBtn');
+            if (lblEl && m.data.liveMatch) updateClockBtn(!!m.data.liveMatch.timerRunning);
+          }
+        } catch (_) {}
+      };
+
+      // Keyboard shortcuts
+      document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+        const key = e.key.toUpperCase();
+        if (key === 'A') { lmAdjust('blue', 'kills', 1); toast('Blue +1 kill'); }
+        else if (key === 'S') { lmAdjust('red', 'kills', 1); toast('Red +1 kill'); }
+        else if (key === 'Q') { lmAdjust('blue', 'turrets', 1); toast('Blue +1 turret'); }
+        else if (key === 'W') { lmAdjust('red', 'turrets', 1); toast('Red +1 turret'); }
+        else if (key === 'G') { endGame(); }
+        else if (key === '?' || (e.shiftKey && key === '/')) {
+          document.getElementById('shortcutsHelp').classList.toggle('visible');
+        }
+        else if (key === 'ESCAPE') {
+          document.getElementById('shortcutsHelp').classList.remove('visible');
+        }
+        else if (e.ctrlKey && key === 'Z') {
+          e.preventDefault();
+          toast('Undo (coming soon)');
+        }
+        else if (e.ctrlKey && key === 'Y') {
+          e.preventDefault();
+          toast('Redo (coming soon)');
+        }
+      });
+    }
+
+    init();
+  </script>
+
+  <!-- Keyboard shortcuts help overlay -->
+  <div id="shortcutsHelp" style="
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+  ">
+    <div style="
+      background: #0f172a;
+      border: 2px solid #f59e0b;
+      border-radius: 16px;
+      padding: 30px 40px;
+      max-width: 500px;
+      width: 90%;
+    ">
+      <h2 style="font-family:'Teko';font-size:28px;color:#fbbf24;margin-bottom:16px;letter-spacing:2px;">KEYBOARD SHORTCUTS</h2>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:15px;">
+        <div style="display:flex;justify-content:space-between;"><span style="color:#94a3b8;">Blue +1 Kill</span><kbd style="background:#1e293b;padding:2px 10px;border-radius:4px;border:1px solid #334155;font-family:'Teko';font-size:17px;">A</kbd></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:#94a3b8;">Red +1 Kill</span><kbd style="background:#1e293b;padding:2px 10px;border-radius:4px;border:1px solid #334155;font-family:'Teko';font-size:17px;">S</kbd></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:#94a3b8;">Blue +1 Turret</span><kbd style="background:#1e293b;padding:2px 10px;border-radius:4px;border:1px solid #334155;font-family:'Teko';font-size:17px;">Q</kbd></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:#94a3b8;">Red +1 Turret</span><kbd style="background:#1e293b;padding:2px 10px;border-radius:4px;border:1px solid #334155;font-family:'Teko';font-size:17px;">W</kbd></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:#94a3b8;">End Game</span><kbd style="background:#1e293b;padding:2px 10px;border-radius:4px;border:1px solid #334155;font-family:'Teko';font-size:17px;">G</kbd></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:#94a3b8;">Show Shortcuts</span><kbd style="background:#1e293b;padding:2px 10px;border-radius:4px;border:1px solid #334155;font-family:'Teko';font-size:17px;">?</kbd></div>
+      </div>
+      <div style="margin-top:16px;text-align:right;">
+        <button onclick="document.getElementById('shortcutsHelp').classList.remove('visible')" style="font-family:'Teko';font-size:18px;background:#f59e0b;color:#090d16;border:none;padding:6px 20px;border-radius:6px;cursor:pointer;">CLOSE</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

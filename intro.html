@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLBB Tournament Intro Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      width: 1920px; height: 1080px;
+      overflow: hidden;
+      background: transparent;
+      font-family: 'Teko', sans-serif;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .intro-box {
+      text-align: center;
+      animation: pop 0.8s cubic-bezier(0.14, 1.15, 0.3, 1.05) both;
+      position: relative;
+    }
+    @keyframes pop {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .ring {
+      width: 420px; height: 420px;
+      margin: 0 auto 40px;
+      border-radius: 50%;
+      border: 6px solid #f59e0b;
+      box-shadow: 0 0 60px rgba(245, 158, 11, 0.6), inset 0 0 40px rgba(245, 158, 11, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: ringGlow 3s ease-in-out infinite, ringSpin 20s linear infinite;
+      position: relative;
+    }
+    .ring::before {
+      content: '';
+      position: absolute;
+      inset: -12px;
+      border-radius: 50%;
+      border: 2px solid rgba(245, 158, 11, 0.2);
+      animation: ringPulse 3s ease-in-out infinite;
+    }
+    .ring::after {
+      content: '';
+      position: absolute;
+      inset: -24px;
+      border-radius: 50%;
+      border: 1px solid rgba(245, 158, 11, 0.1);
+      animation: ringPulse 3s ease-in-out 0.5s infinite;
+    }
+    @keyframes ringGlow {
+      0%, 100% { box-shadow: 0 0 40px rgba(245, 158, 11, 0.5), inset 0 0 30px rgba(245, 158, 11, 0.25); }
+      50% { box-shadow: 0 0 90px rgba(245, 158, 11, 0.8), inset 0 0 50px rgba(245, 158, 11, 0.4); }
+    }
+    @keyframes ringPulse {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.02); }
+    }
+    @keyframes ringSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .ring-inner {
+      font-size: 110px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: #fff;
+      text-shadow: 0 0 30px rgba(245, 158, 11, 0.9);
+      animation: none;
+    }
+
+    .title {
+      font-size: 66px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #fbbf24;
+      text-shadow: 0 0 24px rgba(245, 158, 11, 0.7);
+      animation: titleReveal 0.8s ease 0.3s both;
+    }
+    @keyframes titleReveal {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .subtitle {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: #cbd5e1;
+      margin-top: 6px;
+      text-transform: uppercase;
+      animation: titleReveal 0.8s ease 0.5s both;
+    }
+
+    /* Particle dots */
+    .particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      width: 3px; height: 3px;
+      background: rgba(245, 158, 11, 0.4);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+      50% { transform: translateY(-40px) scale(1.5); opacity: 0.8; }
+    }
+  </style>
+</head>
+<body>
+  <div class="particles" id="particles"></div>
+  <div class="intro-panel">
+    <div class="ring">
+      <div id="introInit" class="ring-inner">ML</div>
+    </div>
+    <div id="introTitle" class="title">MLBB TOURNAMENT 2026</div>
+    <div id="introStage" class="subtitle">GRAND FINALS</div>
+  </div>
+
+  <script>
+    // Generate particles
+    const pc = document.getElementById('particles');
+    for (let i = 0; i < 20; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = Math.random() * 100 + '%';
+      p.style.top = Math.random() * 100 + '%';
+      p.style.animationDelay = Math.random() * 6 + 's';
+      p.style.animationDuration = (4 + Math.random() * 4) + 's';
+      pc.appendChild(p);
+    }
+    async function render() {
+      try {
+        const d = await (await fetch('/api/data?t=' + Date.now())).json();
+        const name = d.tournamentName || 'MLBB TOURNAMENT';
+        document.getElementById('introInit').innerText = name.replace(/[^A-Za-z]/g, '').slice(0, 3).toUpperCase() || 'ML';
+        document.getElementById('introTitle').innerText = name;
+        document.getElementById('introStage').innerText = d.matchStage || 'MATCH';
+      } catch (_) {}
+    }
+    render();
+    setInterval(render, 2000);
+  </script>
+</body>
+</html>

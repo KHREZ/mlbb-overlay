@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLBB Timeline Graph</title>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #3b82f6;
+      --red: #ef4444;
+      --gold: #f59e0b;
+      --bg: #06080f;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      width: 1920px; height: 1080px;
+      overflow: hidden;
+      background: transparent;
+      font-family: 'Rajdhani', sans-serif;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .timeline-container {
+      width: 1600px;
+      background: linear-gradient(160deg, rgba(12, 16, 28, 0.97), rgba(24, 30, 46, 0.95));
+      border: 2px solid rgba(245, 158, 11, 0.3);
+      border-radius: 18px;
+      padding: 30px 40px;
+      opacity: 0;
+      animation: fadeIn 0.7s ease both;
+    }
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .timeline-title {
+      font-family: 'Teko';
+      font-size: 32px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    .timeline-clock {
+      font-family: 'Teko';
+      font-size: 36px;
+      color: var(--gold);
+      text-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+    }
+
+    .graph-area {
+      position: relative;
+      height: 500px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+    }
+
+    .graph-center-line {
+      position: absolute;
+      top: 50%;
+      left: 0; right: 0;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .graph-label {
+      position: absolute;
+      right: 10px;
+      font-family: 'Teko';
+      font-size: 14px;
+      letter-spacing: 1px;
+      color: #64748b;
+    }
+    .graph-label.top { top: 10px; }
+    .graph-label.bottom { bottom: 10px; }
+    .graph-label.mid { top: 50%; transform: translateY(-50%); }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 16px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #94a3b8;
+    }
+    .legend-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+    }
+    .legend-dot.blue { background: var(--blue); }
+    .legend-dot.red { background: var(--red); }
+
+    .obj-markers {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .obj-marker {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 2px;
+      background: rgba(245, 158, 11, 0.4);
+    }
+    .obj-marker::after {
+      content: attr(data-label);
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      font-family: 'Teko';
+      font-size: 12px;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="timeline-container">
+    <div class="timeline-header">
+      <div class="timeline-title">Match Timeline</div>
+      <div id="clock" class="timeline-clock">00:00</div>
+    </div>
+    <div class="graph-area">
+      <div class="graph-center-line"></div>
+      <div class="graph-label top">BLUE LEAD</div>
+      <div class="graph-label mid">EVEN</div>
+      <div class="graph-label bottom">RED LEAD</div>
+      <canvas id="graph"></canvas>
+      <div class="obj-markers" id="objMarkers"></div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot blue"></div>Blue Team Gold</div>
+      <div class="legend-item"><div class="legend-dot red"></div>Red Team Gold</div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('graph');
+    const ctx = canvas.getContext('2d');
+    let dataPoints = [];
+    let clockSecs = 0;
+
+    function resize() {
+      canvas.width = canvas.offsetWidth * 2;
+      canvas.height = canvas.offsetHeight * 2;
+      ctx.scale(2, 2);
+    }
+    resize();
+
+    function addPoint(blueGold, redGold, time) {
+      dataPoints.push({ blue: blueGold, red: redGold, t: time });
+      if (dataPoints.length > 600) dataPoints.shift();
+    }
+
+    function drawGraph() {
+      const w = canvas.offsetWidth;
+      const h = canvas.offsetHeight;
+      ctx.clearRect(0, 0, w, h);
+
+      if (dataPoints.length < 2) return;
+
+      const maxGold = Math.max(
+        ...dataPoints.map(p => Math.max(p.blue, p.red)),
+        1000
+      );
+
+      const toX = (i) => (i / (dataPoints.length - 1)) * w;
+      const toY = (gold) => {
+        const norm = gold / maxGold;
+        return h * 0.1 + (h * 0.8) * (1 - norm);
+      };
+
+      // Blue line
+      ctx.beginPath();
+      ctx.strokeStyle = '#3b82f6';
+      ctx.lineWidth = 3;
+      ctx.shadowColor = 'rgba(59, 130, 246, 0.5)';
+      ctx.shadowBlur = 8;
+      dataPoints.forEach((p, i) => {
+        const x = toX(i);
+        const y = toY(p.blue);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      // Red line
+      ctx.beginPath();
+      ctx.strokeStyle = '#ef4444';
+      ctx.shadowColor = 'rgba(239, 68, 68, 0.5)';
+      dataPoints.forEach((p, i) => {
+        const x = toX(i);
+        const y = toY(p.red);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      // Fill between lines
+      ctx.globalAlpha = 0.1;
+      ctx.beginPath();
+      dataPoints.forEach((p, i) => {
+        const x = toX(i);
+        if (i === 0) ctx.moveTo(x, toY(p.blue));
+        else ctx.lineTo(x, toY(p.blue));
+      });
+      for (let i = dataPoints.length - 1; i >= 0; i--) {
+        ctx.lineTo(toX(i), toY(dataPoints[i].red));
+      }
+      ctx.closePath();
+      ctx.fillStyle = '#3b82f6';
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
+    function fmtClock(secs) {
+      secs = Math.max(0, Math.floor(secs));
+      return String(Math.floor(secs / 60)).padStart(2, '0') + ':' + String(secs % 60).padStart(2, '0');
+    }
+
+    function update(data) {
+      if (!data) return;
+      const lm = data.liveMatch || {};
+      const blue = lm.blue || {};
+      const red = lm.red || {};
+      clockSecs = lm.timerSeconds || 0;
+
+      document.getElementById('clock').innerText = fmtClock(clockSecs);
+
+      const blueGold = parseInt(blue.gold) || 0;
+      const redGold = parseInt(red.gold) || 0;
+      if (blueGold > 0 || redGold > 0) {
+        addPoint(blueGold, redGold, clockSecs);
+      }
+      drawGraph();
+    }
+
+    async function init() {
+      const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}`);
+      ws.onmessage = (e) => {
+        try {
+          const m = JSON.parse(e.data);
+          if (m.type === 'INIT' || m.type === 'UPDATE') update(m.data);
+        } catch (_) {}
+      };
+      ws.onclose = () => setTimeout(init, 2000);
+      update(await (await fetch('/api/data')).json());
+    }
+
+    init();
+  </script>
+</body>
+</html>

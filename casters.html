@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLBB Casters Lower Third & Ticker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+    body {
+      width: 1920px; height: 1080px;
+      overflow: hidden;
+      background: transparent;
+      font-family: 'Rajdhani', sans-serif;
+      color: #fff;
+    }
+
+    /* Lower third */
+    .caster-stack {
+      position: absolute;
+      bottom: 120px;
+      left: 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 620px;
+    }
+
+    .caster-card {
+      background: linear-gradient(90deg, rgba(12, 16, 28, 0.92) 0%, rgba(24, 32, 50, 0.88) 100%);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-left: 5px solid #f59e0b;
+      border-radius: 0 10px 10px 0;
+      padding: 13px 26px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+      transition: all 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+      opacity: 0;
+      transform: translateX(-80px);
+    }
+    .caster-card.visible { opacity: 1; transform: translateX(0); }
+    .caster-card.hidden { opacity: 0; transform: translateX(-80px); }
+
+    .caster-avatar {
+      width: 58px; height: 58px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f59e0b, #b45309);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Teko';
+      font-size: 26px;
+      font-weight: 700;
+      color: #0f1120;
+      flex-shrink: 0;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
+      transition: transform 0.3s ease;
+    }
+    .caster-card.visible .caster-avatar {
+      animation: avatarPop 0.5s cubic-bezier(0.14, 1.15, 0.3, 1.05) both;
+    }
+    @keyframes avatarPop {
+      from { transform: scale(0.5) rotate(-10deg); }
+      to { transform: scale(1) rotate(0deg); }
+    }
+
+    .caster-info { display: flex; flex-direction: column; min-width: 0; }
+
+    .caster-title {
+      font-family: 'Teko';
+      font-size: 15px;
+      color: #fbbf24;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    .caster-name {
+      font-size: 26px;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.05;
+    }
+
+    .caster-handle {
+      font-size: 14px;
+      color: #94a3b8;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    /* Ticker */
+    .ticker-bar {
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 1920px; height: 52px;
+      background: #070a12;
+      border-top: 2px solid #f59e0b;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      box-shadow: 0 -6px 22px rgba(0, 0, 0, 0.85);
+    }
+
+    .ticker-tag {
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+      color: #0f1120;
+      font-family: 'Teko';
+      font-size: 22px;
+      font-weight: 700;
+      padding: 0 30px;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      letter-spacing: 1px;
+      z-index: 2;
+      box-shadow: 6px 0 12px rgba(245, 158, 11, 0.35);
+      text-transform: uppercase;
+    }
+
+    .ticker-content {
+      white-space: nowrap;
+      animation: tick 30s linear infinite;
+      font-size: 18px;
+      font-weight: 700;
+      color: #cbd5e1;
+      letter-spacing: 1px;
+      padding-left: 40px;
+    }
+
+    @keyframes tick {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="caster-stack">
+    <div id="casterCard" class="caster-card hidden">
+      <div class="caster-avatar" id="c1Avatar">1</div>
+      <div class="caster-info">
+        <div class="caster-title">Caster</div>
+        <div id="c1Name" class="caster-name">Caster 1</div>
+        <div id="c1Handle" class="caster-handle">@caster1</div>
+      </div>
+    </div>
+
+    <div id="caster2Card" class="caster-card hidden">
+      <div class="caster-avatar" id="c2Avatar">2</div>
+      <div class="caster-info">
+        <div class="caster-title">Caster</div>
+        <div id="c2Name" class="caster-name">Caster 2</div>
+        <div id="c2Handle" class="caster-handle">@caster2</div>
+      </div>
+    </div>
+
+    <div id="analystCard" class="caster-card hidden">
+      <div class="caster-avatar" id="aAvatar">A</div>
+      <div class="caster-info">
+        <div class="caster-title">Analyst</div>
+        <div id="aName" class="caster-name">Analyst</div>
+        <div id="aHandle" class="caster-handle">@analyst</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ticker-bar">
+    <div class="ticker-tag">Live Feed</div>
+    <div id="tickerText" class="ticker-content">
+      WELCOME TO MLBB TOURNAMENT 2026 • OFFICIAL BROADCAST • SUPPORT YOUR FAVORITE TEAM • #MLBBTOURNAMENT
+    </div>
+  </div>
+
+  <!-- Background dim that turns on only when casters cards visible -->
+  <div id="dimLayer" style="position:absolute;left:0;bottom:52px;width:0;height:0;box-shadow:0 0 0 0;"></div>
+
+  <script>
+    function setCard(id, show) {
+      const el = document.getElementById(id);
+      if (show) el.classList.add('visible'), el.classList.remove('hidden');
+      else el.classList.remove('visible'), el.classList.add('hidden');
+    }
+
+    function updateCasters(data) {
+      if (!data || !data.casters) return;
+      const c = data.casters;
+
+      const c1 = c.caster1 || {};
+      const c2 = c.caster2 || {};
+      const an = c.analyst || {};
+
+      document.getElementById('c1Name').innerText = c1.name || 'Caster 1';
+      document.getElementById('c1Handle').innerText = c1.handle || '@caster1';
+      document.getElementById('c1Avatar').innerText = (c1.name || 'C1').charAt(0).toUpperCase();
+
+      document.getElementById('c2Name').innerText = c2.name || 'Caster 2';
+      document.getElementById('c2Handle').innerText = c2.handle || '@caster2';
+      document.getElementById('c2Avatar').innerText = (c2.name || 'C2').charAt(0).toUpperCase();
+
+      document.getElementById('aName').innerText = an.name || 'Analyst';
+      document.getElementById('aHandle').innerText = an.handle || '@analyst';
+      document.getElementById('aAvatar').innerText = (an.name || 'A').charAt(0).toUpperCase();
+
+      const showCards = c.showCards !== undefined ? c.showCards : (c.showLowerThird !== undefined ? c.showLowerThird : true);
+      setCard('casterCard', showCards && (c1.name || c1.handle));
+      setCard('caster2Card', showCards && (c2.name || c2.handle));
+      setCard('analystCard', showCards && an.name);
+
+      if (c.tickerMessage) {
+        document.getElementById('tickerText').innerText = (c.tickerMessage + '     ✦     ').repeat(4);
+      }
+    }
+
+    async function init() {
+      const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}`);
+      ws.onmessage = (e) => {
+        try {
+          const m = JSON.parse(e.data);
+          if (m.type === 'INIT' || m.type === 'UPDATE') updateCasters(m.data);
+        } catch (_) {}
+      };
+      ws.onclose = () => setTimeout(init, 2000);
+      updateCasters(await (await fetch('/api/data')).json());
+    }
+
+    init();
+  </script>
+</body>
+</html>

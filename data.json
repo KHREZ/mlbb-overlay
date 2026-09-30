@@ -1,0 +1,206 @@
+{
+  "tournamentName": "MLBB TOURNAMENT 2026",
+  "matchStage": "GRAND FINALS",
+  "matchFormat": "BO3",
+  "currentGame": 1,
+  "statusText": "LIVE MATCH",
+  "banCount": 3,
+  "teamA": {
+    "name": "ONIC PH",
+    "tag": "ONIC",
+    "score": 0,
+    "color": "#2563eb",
+    "logo": "",
+    "side": "blue",
+    "bans": [
+      "ling",
+      "fanny",
+      "novaria",
+      "",
+      ""
+    ],
+    "picks": [
+      {
+        "hero": "terizla",
+        "player": "Sanford",
+        "role": "EXP",
+        "spell": "Flicker",
+        "emblem": "Fighter"
+      },
+      {
+        "hero": "fredrinn",
+        "player": "KarlTzy",
+        "role": "Jungle",
+        "spell": "Retribution",
+        "emblem": "Tank"
+      },
+      {
+        "hero": "faramis",
+        "player": "Sanji",
+        "role": "Mid",
+        "spell": "Flicker",
+        "emblem": "Support"
+      },
+      {
+        "hero": "claude",
+        "player": "Kelra",
+        "role": "Gold",
+        "spell": "Inspire",
+        "emblem": "Marksman"
+      },
+      {
+        "hero": "minotaur",
+        "player": "Yawi",
+        "role": "Roam",
+        "spell": "Vengeance",
+        "emblem": "Tank"
+      }
+    ]
+  },
+  "teamB": {
+    "name": "ECHO",
+    "tag": "ECHO",
+    "score": 0,
+    "color": "#dc2626",
+    "logo": "",
+    "side": "red",
+    "bans": [
+      "chou",
+      "faramis",
+      "wanwan",
+      "",
+      ""
+    ],
+    "picks": [
+      {
+        "hero": "yu_zhing",
+        "player": "FlapTzy",
+        "role": "EXP",
+        "spell": "Flicker",
+        "emblem": "Fighter"
+      },
+      {
+        "hero": "baxia",
+        "player": "Kairi",
+        "role": "Jungle",
+        "spell": "Retribution",
+        "emblem": "Tank"
+      },
+      {
+        "hero": "valentina",
+        "player": "Pheww",
+        "role": "Mid",
+        "spell": "Flicker",
+        "emblem": "Assassin"
+      },
+      {
+        "hero": "beatrix",
+        "player": "Oheb",
+        "role": "Gold",
+        "spell": "Inspire",
+        "emblem": "Marksman"
+      },
+      {
+        "hero": "mathilda",
+        "player": "Ribo",
+        "role": "Roam",
+        "spell": "Vengeance",
+        "emblem": "Support"
+      }
+    ]
+  },
+  "draftState": {
+    "phaseText": "BLUE SIDE BANNING",
+    "timerSeconds": 30,
+    "isTimerRunning": false
+  },
+  "liveMatch": {
+    "timerSeconds": 0,
+    "timerRunning": false,
+    "autoActive": true,
+    "blue": {
+      "kills": 0,
+      "gold": "0",
+      "turrets": 0
+    },
+    "red": {
+      "kills": 0,
+      "gold": "0",
+      "turrets": 0
+    }
+  },
+  "autoScore": {
+    "enabled": true,
+    "refreshMs": 1000,
+    "sourceName": "scrcpy - Phone",
+    "regions": {
+      "timer": {
+        "x": 0.47,
+        "y": 0.052,
+        "w": 0.075,
+        "h": 0.035
+      },
+      "blueKills": {
+        "x": 0.29,
+        "y": 0.052,
+        "w": 0.05,
+        "h": 0.035
+      },
+      "redKills": {
+        "x": 0.66,
+        "y": 0.052,
+        "w": 0.05,
+        "h": 0.035
+      }
+    }
+  },
+  "objectives": {
+    "enabled": true,
+    "warningSec": 30,
+    "series": {
+      "games": 1,
+      "wonBy": null,
+      "currentGame": 1
+    },
+    "turtle": {
+      "firstSpawn": 120,
+      "respawn": 120,
+      "phaseEnd": 480,
+      "nextSpawn": 120,
+      "state": "waiting",
+      "warned": false,
+      "slainBy": null
+    },
+    "lord": {
+      "firstSpawn": 480,
+      "respawn": 180,
+      "nextSpawn": 480,
+      "state": "waiting",
+      "warned": false,
+      "slainBy": null
+    },
+    "lastEvent": null
+  },
+  "casters": {
+    "caster1": {
+      "name": "Caster Wolf",
+      "handle": "@wolf_casts"
+    },
+    "caster2": {
+      "name": "Caster Rock",
+      "handle": "@rock_mlbb"
+    },
+    "showLowerThird": true,
+    "tickerMessage": "WELCOME TO MLBB TOURNAMENT 2026 • LIVE BROADCAST • #MLBBTOURNAMENT"
+  },
+  "mvp": {
+    "playerName": "Kelra",
+    "teamTag": "ONIC",
+    "heroName": "Claude",
+    "kda": "10 / 1 / 8",
+    "gold": "14.2k",
+    "damage": "85,420",
+    "showCard": true
+  },
+  "matchHistory": []
+}

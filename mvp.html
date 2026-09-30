@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLBB MVP Announcement Card</title>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+    body {
+      width: 1920px; height: 1080px;
+      overflow: hidden;
+      background: transparent;
+      font-family: 'Rajdhani', sans-serif;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .mvp-wrap {
+      position: relative;
+      width: 760px;
+      background: linear-gradient(160deg, rgba(12, 16, 28, 0.97), rgba(24, 30, 46, 0.97));
+      border: 3px solid #f59e0b;
+      border-radius: 18px;
+      padding: 30px 34px;
+      box-shadow: 0 0 60px rgba(245, 158, 11, 0.45), inset 0 0 40px rgba(245, 158, 11, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 0;
+      transform: scale(0.85) translateY(20px);
+      transition: all 0.55s cubic-bezier(0.14, 1.15, 0.3, 1.05);
+      overflow: hidden;
+    }
+    .mvp-wrap::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(from 0deg, transparent, rgba(245, 158, 11, 0.08), transparent, rgba(245, 158, 11, 0.04), transparent);
+      animation: cardShine 6s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes cardShine {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .mvp-wrap.visible { opacity: 1; transform: scale(1) translateY(0); }
+    .mvp-wrap.visible .mvp-badge { animation: badgePulse 2.2s ease-in-out infinite; }
+    .mvp-wrap.visible .hero-box { animation: heroSlide 0.6s ease 0.2s both; }
+    .mvp-wrap.visible .stats-grid { animation: heroSlide 0.6s ease 0.4s both; }
+    @keyframes heroSlide {
+      from { transform: translateY(15px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .mvp-badge {
+      background: linear-gradient(90deg, #f59e0b, #fbbf24);
+      color: #0f1120;
+      font-family: 'Teko';
+      font-size: 30px;
+      font-weight: 700;
+      padding: 3px 34px;
+      border-radius: 8px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 22px;
+      box-shadow: 0 0 18px #f59e0b;
+      animation: badgePulse 2.2s ease-in-out infinite;
+    }
+    @keyframes badgePulse {
+      0%, 100% { box-shadow: 0 0 14px #f59e0b; }
+      50% { box-shadow: 0 0 30px #fbbf24; }
+    }
+
+    .player-title {
+      font-family: 'Teko';
+      font-size: 62px;
+      color: #fff;
+      line-height: 1;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .team-tag {
+      color: #f59e0b;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      margin-top: 2px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+
+    .hero-box {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      background: rgba(8, 12, 24, 0.9);
+      border: 2px solid rgba(255, 255, 255, 0.14);
+      border-radius: 12px;
+      padding: 16px 34px;
+      width: 100%;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .mvp-hero-img {
+      width: 84px; height: 84px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 3px solid #f59e0b;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+    }
+    .mvp-hero-ph {
+      width: 84px; height: 84px;
+      border-radius: 10px;
+      background: #1e293b;
+      border: 3px solid #f59e0b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Teko';
+      font-size: 32px;
+      color: #cbd5e1;
+    }
+
+    .hero-meta .lbl {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .mvp-hero-name { font-family: 'Teko'; font-size: 38px; color: #fbbf24; line-height: 1; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      width: 100%;
+    }
+
+    .stat-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 12px 8px;
+      text-align: center;
+    }
+    .stat-label {
+      font-size: 13px;
+      color: #94a3b8;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .stat-val {
+      font-family: 'Teko';
+      font-size: 32px;
+      color: #f8fafc;
+      line-height: 1;
+      margin-top: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="mvpCard" class="mvp-wrap">
+    <div class="mvp-badge">Match MVP ✦ Player of the Match</div>
+    <div id="mvpPlayer" class="player-title">KELRA</div>
+    <div id="mvpTeam" class="team-tagline">ONIC PH</div>
+
+    <div class="hero-box">
+      <div id="mvpHeroWrap"></div>
+      <div class="hero-meta">
+        <div class="lbl">Hero Played</div>
+        <div id="mvpHeroName" class="mvp-hero-name">CLAUDE</div>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-label">K / D / A</div>
+        <div id="mvpKda" class="stat-val">10 / 1 / 8</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Net Worth</div>
+        <div id="mvpGold" class="stat-val">14.2K</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Damage</div>
+        <div id="mvpDamage" class="stat-val">85,420</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let heroesData = {};
+
+    async function loadHeroes() {
+      const list = await (await fetch('/api/heroes')).json();
+      list.forEach(h => heroesData[h.id] = h);
+    }
+
+    function keyFor(name) {
+      if (!name) return '';
+      return name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    }
+
+    function updateMvp(data) {
+      if (!data || !data.mvp) return;
+      const m = data.mvp;
+      const card = document.getElementById('mvpCard');
+      if (m.showCard) card.classList.add('visible'); else card.classList.remove('visible');
+
+      document.getElementById('mvpPlayer').innerText = m.playerName || 'PLAYER';
+      document.getElementById('mvpTeam').innerText = m.teamTag || 'TEAM';
+      document.getElementById('mvpKda').innerText = m.kda || '0 / 0 / 0';
+      document.getElementById('mvpGold').innerText = m.gold || '0K';
+      document.getElementById('mvpDamage').innerText = m.damage || '0';
+
+      const key = keyFor(m.heroName);
+      let hero = Object.values(heroesData).find(h => h.id === key || keyFor(h.name) === key);
+      hero = hero || { name: m.heroName || 'HERO', icon: '' };
+      document.getElementById('mvpHeroName').innerText = hero.name;
+
+      const wrap = document.getElementById('mvpHeroWrap');
+      if (hero.icon) wrap.innerHTML = `<img src="${hero.icon}" class="mvp-hero-img">`;
+      else wrap.innerHTML = `<div class="mvp-hero-ph">${hero.name.charAt(0)}</div>`;
+    }
+
+    async function init() {
+      await loadHeroes();
+      const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}`);
+      ws.onmessage = (e) => {
+        try {
+          const m = JSON.parse(e.data);
+          if (m.type === 'INIT' || m.type === 'UPDATE') updateMvp(m.data);
+        } catch (_) {}
+      };
+      ws.onclose = () => setTimeout(init, 2000);
+      updateMvp(await (await fetch('/api/data')).json());
+    }
+
+    init();
+  </script>
+</body>
+</html>

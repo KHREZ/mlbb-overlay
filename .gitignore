@@ -1,0 +1,6 @@
+node_modules/
+server.log
+*.log
+.idea/
+.env
+*.local

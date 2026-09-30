@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLBB Team Statistics</title>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #3b82f6;
+      --red: #ef4444;
+      --gold: #f59e0b;
+      --bg: #06080f;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      width: 1920px; height: 1080px;
+      overflow: hidden;
+      background: transparent;
+      font-family: 'Rajdhani', sans-serif;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .stats-container {
+      display: flex;
+      gap: 60px;
+      align-items: stretch;
+    }
+
+    .team-panel {
+      width: 720px;
+      background: linear-gradient(160deg, rgba(12, 16, 28, 0.97), rgba(24, 30, 46, 0.95));
+      border-radius: 18px;
+      padding: 30px;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: panelIn 0.7s ease both;
+    }
+    .team-panel.blue { border: 2px solid rgba(59, 130, 246, 0.5); }
+    .team-panel.red { border: 2px solid rgba(239, 68, 68, 0.5); animation-delay: 0.15s; }
+    @keyframes panelIn {
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .team-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+    }
+    .team-logo {
+      width: 64px; height: 64px;
+      border-radius: 12px;
+      object-fit: contain;
+      background: #1e293b;
+    }
+    .team-info { flex: 1; }
+    .team-name {
+      font-family: 'Teko';
+      font-size: 38px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    .team-panel.blue .team-name { color: #93c5fd; }
+    .team-panel.red .team-name { color: #fca5a5; }
+    .team-record {
+      font-size: 15px;
+      font-weight: 700;
+      color: #94a3b8;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+    .team-score {
+      font-family: 'Teko';
+      font-size: 52px;
+      font-weight: 700;
+      color: var(--gold);
+      text-shadow: 0 0 16px rgba(245, 158, 11, 0.6);
+    }
+
+    .stat-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .stat-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .stat-label {
+      width: 140px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .stat-bar-wrap {
+      flex: 1;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+    }
+    .stat-bar {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.8s cubic-bezier(0.2, 0.9, 0.3, 1);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 10px;
+      font-family: 'Teko';
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      min-width: 40px;
+    }
+    .stat-bar.blue { background: linear-gradient(90deg, #1d4ed8, #3b82f6); }
+    .stat-bar.red { background: linear-gradient(90deg, #dc2626, #ef4444); }
+
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .role-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 12px 8px;
+      text-align: center;
+    }
+    .role-card .role-name {
+      font-family: 'Teko';
+      font-size: 16px;
+      color: #94a3b8;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .role-card .role-hero {
+      font-family: 'Teko';
+      font-size: 20px;
+      color: var(--gold);
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .vs-badge {
+      font-family: 'Teko';
+      font-size: 48px;
+      color: var(--gold);
+      text-shadow: 0 0 20px rgba(245, 158, 11, 0.6);
+      align-self: center;
+      animation: vsPulse 2s ease-in-out infinite;
+    }
+    @keyframes vsPulse {
+      0%, 100% { opacity: 0.7; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stats-container">
+    <div id="teamA" class="team-panel blue"></div>
+    <div class="vs-badge">VS</div>
+    <div id="teamB" class="team-panel red"></div>
+  </div>
+
+  <script>
+    function renderTeamPanel(el, team, side) {
+      const picks = team.picks || [];
+      const roles = ['EXP', 'Jungle', 'Mid', 'Gold', 'Roam'];
+      const roleHeroes = roles.map(r => {
+        const pick = picks.find(p => p.role === r);
+        return { role: r, hero: pick ? pick.hero : '' };
+      });
+
+      const wins = parseInt(team.score) || 0;
+      el.innerHTML = `
+        <div class="team-header">
+          ${team.logo ? `<img src="${team.logo}" class="team-logo" onerror="this.style.display='none'">` : ''}
+          <div class="team-info">
+            <div class="team-name">${team.name || 'TEAM'}</div>
+            <div class="team-record">${wins} WINS IN SERIES</div>
+          </div>
+          <div class="team-score">${wins}</div>
+        </div>
+        <div class="role-grid">
+          ${roleHeroes.map(r => `
+            <div class="role-card">
+              <div class="role-name">${r.role}</div>
+              <div class="role-hero">${r.hero || '—'}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderStats(data) {
+      if (!data) return;
+      const a = data.teamA || {};
+      const b = data.teamB || {};
+      renderTeamPanel(document.getElementById('teamA'), a, 'blue');
+      renderTeamPanel(document.getElementById('teamB'), b, 'red');
+    }
+
+    async function init() {
+      const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}`);
+      ws.onmessage = (e) => {
+        try {
+          const m = JSON.parse(e.data);
+          if (m.type === 'INIT' || m.type === 'UPDATE') renderStats(m.data);
+        } catch (_) {}
+      };
+      ws.onclose = () => setTimeout(init, 2000);
+      renderStats(await (await fetch('/api/data')).json());
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLBB Draft Pick & Ban Overlay</title>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+    body {
+      width: 1920px; height: 1080px;
+      overflow: hidden;
+      background: transparent;
+      font-family: 'Rajdhani', sans-serif;
+      color: #fff;
+    }
+
+    /* ---------- Phase bar (top center) ---------- */
+    .phase-bar {
+      position: absolute;
+      top: 26px; left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(180deg, rgba(10, 14, 26, 0.97), rgba(20, 26, 44, 0.94));
+      border: 2px solid rgba(245, 158, 11, 0.65);
+      border-radius: 12px;
+      padding: 6px 38px;
+      box-shadow: 0 0 34px rgba(245, 158, 11, 0.3), inset 0 0 18px rgba(245, 158, 11, 0.08);
+      z-index: 30;
+      animation: phaseGlow 2.6s ease-in-out infinite;
+    }
+    @keyframes phaseGlow {
+      0%, 100% { box-shadow: 0 0 22px rgba(245, 158, 11, 0.25), inset 0 0 18px rgba(245, 158, 11, 0.06); }
+      50% { box-shadow: 0 0 44px rgba(245, 158, 11, 0.45), inset 0 0 24px rgba(245, 158, 11, 0.12); }
+    }
+    .phase-text {
+      font-family: 'Teko', sans-serif;
+      font-size: 38px;
+      letter-spacing: 3px;
+      color: #fbbf24;
+      text-transform: uppercase;
+      line-height: 1;
+      text-shadow: 0 0 14px rgba(245, 158, 11, 0.7);
+    }
+    .phase-timer {
+      font-family: 'Teko', sans-serif;
+      font-size: 42px;
+      font-weight: 600;
+      color: #f87171;
+      min-width: 92px;
+      text-align: center;
+      line-height: 1;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      border-radius: 8px;
+      padding: 2px 10px;
+      text-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+    }
+    .phase-sub {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 2.5px;
+      color: #94a3b8;
+      text-align: center;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: 6px;
+      white-space: nowrap;
+    }
+
+    /* ---------- Ban slots (top corners) ---------- */
+    .bans-block { position: absolute; top: 24px; z-index: 20; }
+    .bans-block.blue { left: 34px; }
+    .bans-block.red { right: 34px; }
+    .bans-label {
+      font-family: 'Teko', sans-serif;
+      font-size: 20px;
+      letter-spacing: 3px;
+      color: #64748b;
+      margin-bottom: 7px;
+      text-transform: uppercase;
+    }
+    .bans-block.red .bans-label { text-align: right; }
+    .bans-row { display: flex; gap: 9px; }
+    .bans-block.red .bans-row { flex-direction: row-reverse; }
+    .ban-slot {
+      width: 92px; height: 92px;
+      background: rgba(12, 16, 28, 0.92);
+      border: 2px solid rgba(239, 68, 68, 0.6);
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 16px rgba(239, 68, 68, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.4s ease;
+    }
+    .ban-slot:not(.empty) {
+      animation: banReveal 0.5s cubic-bezier(0.14, 1.15, 0.3, 1.05) both;
+    }
+    @keyframes banReveal {
+      from { transform: scale(0.6) rotate(-5deg); opacity: 0; }
+      to { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    .ban-slot img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      filter: grayscale(55%) brightness(0.68);
+    }
+    .ban-slot .x {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 46px;
+      font-weight: 700;
+      color: #ef4444;
+      text-shadow: 0 0 8px #000, 0 0 18px rgba(239, 68, 68, 0.9);
+      background: radial-gradient(circle, rgba(239, 68, 68, 0.18) 0%, transparent 65%);
+      z-index: 2;
+    }
+    .ban-slot.empty { border-style: dashed; border-color: rgba(148, 163, 184, 0.35); box-shadow: none; }
+    .ban-slot .empty-txt { color: #475569; font-family: 'Teko', sans-serif; font-size: 30px; }
+    .ban-slot .mini-name {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Teko'; font-size: 21px; color: #e2e8f0;
+      background: rgba(12, 16, 28, 0.75);
+      text-transform: uppercase;
+      z-index: 1;
+    }
+
+    /* ---------- Pick frames (left / right margins) ---------- */
+    .pick-stack { position: absolute; top: 190px; display: flex; flex-direction: column; gap: 16px; z-index: 10; }
+    .pick-stack.blue { left: 26px; }
+    .pick-stack.red { right: 26px; }
+
+    .pick-frame { position: relative; width: 470px; height: 128px; transition: all 0.3s ease; }
+    .pick-frame.active-pick {
+      animation: activePickPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes activePickPulse {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.15); }
+    }
+    .pick-frame .shape-bg,
+    .pick-frame .shape-inner {
+      position: absolute;
+      inset: 0;
+    }
+    .pick-frame .shape-bg {
+      clip-path: polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%);
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.06), transparent 60%);
+      border: 2px solid transparent;
+      box-shadow: none;
+    }
+    .pick-frame .glow {
+      position: absolute;
+      inset: 0;
+      filter: blur(14px);
+      opacity: 0.55;
+      clip-path: polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%);
+    }
+    .pick-frame.blue .glow { background: linear-gradient(90deg, rgba(59, 130, 246, 0.9), rgba(37, 99, 235, 0.5)); }
+    .pick-frame.red .glow { background: linear-gradient(270deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.5)); }
+
+    .pick-frame .shape-bg { z-index: 1; }
+    .pick-frame .glow { z-index: 0; }
+    .pick-frame .shape-inner { z-index: 2; }
+
+    .pick-frame.blue .shape-bg { background: linear-gradient(90deg, #3b82f6, #1e3a8a); }
+    .pick-frame.blue .shape-inner {
+      background: linear-gradient(90deg, rgba(8, 13, 26, 0.97) 0%, rgba(15, 23, 42, 0.96) 70%, rgba(30, 58, 138, 0.5) 100%);
+      clip-path: polygon(2px 2px, calc(88% - 2px) 2px, calc(100% - 2px) 50%, calc(88% - 2px) calc(100% - 2px), 2px calc(100% - 2px));
+    }
+    .pick-frame.red .shape-bg { background: linear-gradient(270deg, #ef4444, #7f1d1d); }
+    .pick-frame.red .shape-inner {
+      background: linear-gradient(270deg, rgba(24, 9, 14, 0.97) 0%, rgba(42, 16, 20, 0.96) 70%, rgba(127, 29, 29, 0.5) 100%);
+      clip-path: polygon(calc(100% - 2px) 2px, 12% 2px, 2px 50%, 12% calc(100% - 2px), calc(100% - 2px) calc(100% - 2px));
+    }
+
+    .pick-content {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0 12px;
+    }
+    .pick-stack.red .pick-content { flex-direction: row-reverse; text-align: right; padding: 0 22px 0 12px; }
+
+    .portrait {
+      width: 100px; height: 100px;
+      clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+      object-fit: cover;
+      background: #1e293b;
+      flex-shrink: 0;
+    }
+    .portrait-ph {
+      width: 100px; height: 100px;
+      clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+      background: #1e293b;
+      border: 1px dashed #475569;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Teko';
+      font-size: 40px;
+      color: #475569;
+      flex-shrink: 0;
+    }
+
+    .pick-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+    .pick-stack.red .pick-info { align-items: flex-end; }
+    .pick-ign {
+      font-family: 'Teko', sans-serif;
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      line-height: 1.05;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 230px;
+    }
+    .pick-stack.blue .pick-ign { color: #e0f2fe; text-shadow: 0 0 12px rgba(96, 165, 250, 0.6); }
+    .pick-stack.red .pick-ign { color: #fee2e2; text-shadow: 0 0 12px rgba(248, 113, 113, 0.6); }
+    .pick-hero {
+      font-size: 15px;
+      font-weight: 800;
+      color: #fbbf24;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+    .pick-chips { display: flex; gap: 6px; margin-top: 4px; }
+    .pick-stack.red .pick-chips { justify-content: flex-end; }
+    .chip {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 2px 9px;
+      border-radius: 4px;
+      background: rgba(15, 23, 42, 0.9);
+      white-space: nowrap;
+    }
+    .pick-stack.blue .chip.spell { color: #7dd3fc; border: 1px solid rgba(125, 211, 252, 0.5); }
+    .pick-stack.blue .chip.emblem { color: #c4b5fd; border: 1px solid rgba(196, 181, 253, 0.4); }
+    .pick-stack.red .chip.spell { color: #fca5a5; border: 1px solid rgba(252, 165, 165, 0.5); }
+    .pick-stack.red .chip.emblem { color: #f0abfc; border: 1px solid rgba(240, 171, 252, 0.4); }
+
+    .role-badge {
+      font-family: 'Teko';
+      font-size: 17px;
+      padding: 3px 12px;
+      border-radius: 4px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      white-space: nowrap;
+      align-self: flex-start;
+      margin-top: 14px;
+    }
+    .pick-stack.red .role-badge { margin-top: 14px; }
+
+    /* ---------- Bottom team branding bar ---------- */
+    .brand-bar {
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 1920px; height: 118px;
+      display: flex;
+      z-index: 40;
+    }
+    .brand-side { flex: 1; display: flex; align-items: center; gap: 16px; padding: 0 40px; position: relative; overflow: hidden; }
+    .brand-side.blue {
+      background: linear-gradient(90deg, rgba(30, 58, 138, 0.92), rgba(15, 23, 42, 0.9) 60%, rgba(9, 12, 22, 0.9));
+      border-top: 2px solid rgba(59, 130, 246, 0.8);
+      justify-content: flex-start;
+    }
+    .brand-side.red {
+      background: linear-gradient(270deg, rgba(127, 29, 29, 0.92), rgba(42, 16, 20, 0.9) 60%, rgba(9, 12, 22, 0.9));
+      border-top: 2px solid rgba(239, 68, 68, 0.8);
+      justify-content: flex-end;
+      flex-direction: row-reverse;
+    }
+    .brand-logo {
+      width: 64px; height: 64px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.35));
+    }
+    .brand-logo-ph {
+      width: 64px; height: 64px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Teko';
+      font-size: 30px;
+      font-weight: 700;
+    }
+    .brand-side.blue .brand-logo-ph { background: linear-gradient(135deg, #1d4ed8, #3b82f6); }
+    .brand-side.red .brand-logo-ph { background: linear-gradient(135deg, #b91c1c, #ef4444); }
+    .brand-info { display: flex; flex-direction: column; }
+    .brand-side.red .brand-info { align-items: flex-end; }
+    .brand-name {
+      font-family: 'Teko';
+      font-size: 44px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    .brand-side.blue .brand-name { color: #93c5fd; text-shadow: 0 0 16px rgba(96, 165, 250, 0.7); }
+    .brand-side.red .brand-name { color: #fca5a5; text-shadow: 0 0 16px rgba(248, 113, 113, 0.7); }
+    .brand-meta { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
+    .brand-side.red .brand-meta { flex-direction: row-reverse; }
+    .brand-score {
+      font-family: 'Teko';
+      font-size: 40px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .brand-side.blue .brand-score { color: #bfdbfe; }
+    .brand-side.red .brand-score { color: #fecaca; }
+    .series-pips { display: flex; gap: 7px; }
+    .brand-side.red .series-pips { flex-direction: row-reverse; }
+    .pip {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: #334155;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    .brand-side.blue .pip.active { background: #3b82f6; box-shadow: 0 0 10px #3b82f6; }
+    .brand-side.red .pip.active { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+
+    .brand-center {
+      width: 340px;
+      background: linear-gradient(180deg, #06080f, #0b0f1c);
+      border-top: 2px solid rgba(245, 158, 11, 0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+    .brand-center .game-num {
+      font-family: 'Teko';
+      font-size: 26px;
+      color: #f59e0b;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      text-shadow: 0 0 12px rgba(245, 158, 11, 0.6);
+    }
+    .brand-center .format {
+      font-size: 13px;
+      font-weight: 800;
+      color: #94a3b8;
+      letter-spacing: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Phase bar -->
+  <div class="phase-bar">
+    <div id="phaseText" class="phase-text">DRAFT IN PROGRESS</div>
+    <div id="phaseTimer" class="phase-timer">00:00</div>
+  </div>
+  <div class="phase-sub" id="phaseSub">BLUE SIDE 0 — 0 RED SIDE</div>
+
+  <!-- Bans -->
+  <div class="bans-block blue">
+    <div class="bans-label">Blue Bans</div>
+    <div id="bansA" class="bans-row"></div>
+  </div>
+  <div class="bans-block red">
+    <div class="bans-label">Red Bans</div>
+    <div id="bansB" class="bans-row"></div>
+  </div>
+
+  <!-- Picks -->
+  <div id="picksA" class="pick-stack blue"></div>
+  <div id="picksB" class="pick-stack red"></div>
+
+  <!-- Bottom branding -->
+  <div class="brand-bar">
+    <div class="brand-side blue">
+      <div id="logoA_wrap"><div class="brand-logo-ph">A</div></div>
+      <div class="brand-info">
+        <div id="teamAName" class="brand-name">TEAM A</div>
+        <div class="brand-meta">
+          <div id="scoreA" class="brand-score">0</div>
+          <div id="pipsA" class="series-pips"></div>
+        </div>
+      </div>
+    </div>
+    <div class="brand-center">
+      <div class="game-num" id="gameNum">GAME 1</div>
+      <div class="format" id="format">BO3</div>
+    </div>
+    <div class="brand-side red">
+      <div id="logoB_wrap"><div class="brand-logo-ph">B</div></div>
+      <div class="brand-info">
+        <div id="teamBName" class="brand-name">TEAM B</div>
+        <div class="brand-meta">
+          <div id="scoreB" class="brand-score">0</div>
+          <div id="pipsB" class="series-pips"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let heroesData = {};
+    let banCount = 3;
+    let lastTimer = null;
+
+    async function loadHeroes() {
+      try {
+        const list = await (await fetch('/api/heroes')).json();
+        list.forEach(h => heroesData[h.id] = h);
+      } catch (e) { console.error('heroes', e); }
+    }
+
+    function hero(id) {
+      return heroesData[id] || { name: id ? id.replace(/_/g, ' ').toUpperCase() : 'TBD', icon: '' };
+    }
+
+    function renderPips(id, score, maxGames) {
+      const el = document.getElementById(id);
+      const wins = Math.ceil(maxGames / 2);
+      let html = '';
+      for (let i = 0; i < wins; i++) html += `<div class="pip${i < score ? ' active' : ''}"></div>`;
+      el.innerHTML = html;
+    }
+
+    function renderBans(el, bans) {
+      el.innerHTML = '';
+      for (let i = 0; i < banCount; i++) {
+        const id = bans[i];
+        const h = hero(id);
+        const slot = document.createElement('div');
+        slot.className = 'ban-slot' + (id ? '' : ' empty');
+        if (id && h.icon) slot.innerHTML = `<img src="${h.icon}" alt=""><div class="x">✕</div>`;
+        else if (id) slot.innerHTML = `<div class="mini-name">${h.name}</div><div class="x">✕</div>`;
+        else slot.innerHTML = `<div class="empty-txt">?</div>`;
+        el.appendChild(slot);
+      }
+    }
+
+    function renderPicks(el, picks, side) {
+      el.innerHTML = '';
+      for (let i = 0; i < 5; i++) {
+        const p = picks[i] || {};
+        const h = hero(p.hero);
+        const frame = document.createElement('div');
+        frame.className = 'pick-frame ' + side;
+        const img = (p.hero && h.icon)
+          ? `<img src="${h.icon}" class="portrait" alt="">`
+          : `<div class="portrait-ph">${h.name.charAt(0)}</div>`;
+        const spell = p.spell ? `<div class="chip spell">${p.spell.toUpperCase()}</div>` : '';
+        const emblem = p.emblem ? `<div class="chip emblem">${p.emblem.toUpperCase()}</div>` : '';
+        frame.innerHTML = `
+          <div class="glow"></div>
+          <div class="shape-bg"></div>
+          <div class="shape-inner"></div>
+          <div class="pick-content">
+            ${img}
+            <div class="pick-info">
+              <div class="pick-ign">${p.player || 'PLAYER ' + (i + 1)}</div>
+              <div class="pick-hero">${h.name}</div>
+              <div class="pick-chips">${spell}${emblem}</div>
+            </div>
+            <div class="role-badge">${p.role || 'ROLE'}</div>
+          </div>`;
+        el.appendChild(frame);
+      }
+    }
+
+    function fmtTimer(secs) {
+      secs = Math.max(0, Math.floor(secs || 0));
+      return String(Math.floor(secs / 60)).padStart(2, '0') + ':' + String(secs % 60).padStart(2, '0');
+    }
+
+    function renderDraft(data) {
+      if (!data) return;
+      const a = data.teamA || {}, b = data.teamB || {};
+      banCount = Math.min(5, Math.max(1, parseInt(data.banCount) || 3));
+
+      document.getElementById('teamAName').innerText = a.name || 'TEAM A';
+      document.getElementById('teamBName').innerText = b.name || 'TEAM B';
+      document.getElementById('gameNum').innerText = 'GAME ' + (data.currentGame || 1);
+      document.getElementById('format').innerText = data.matchFormat || 'BO3';
+
+      const scoreA = parseInt(a.score) || 0;
+      const scoreB = parseInt(b.score) || 0;
+      document.getElementById('scoreA').innerText = scoreA;
+      document.getElementById('scoreB').innerText = scoreB;
+      const maxGames = parseInt(String(data.matchFormat || 'BO3').replace('BO', '')) || 3;
+      renderPips('pipsA', scoreA, maxGames);
+      renderPips('pipsB', scoreB, maxGames);
+
+      const logoA = document.getElementById('logoA_wrap');
+      const logoB = document.getElementById('logoB_wrap');
+      logoA.innerHTML = (a.logo && a.logo.trim())
+        ? `<img src="${a.logo}" class="brand-logo" onerror="this.outerHTML='<div class=&quot;brand-logo-ph&quot;>A</div>'">`
+        : `<div class="brand-logo-ph">${(a.name || 'A').charAt(0).toUpperCase()}</div>`;
+      logoB.innerHTML = (b.logo && b.logo.trim())
+        ? `<img src="${b.logo}" class="brand-logo" onerror="this.outerHTML='<div class=&quot;brand-logo-ph&quot;>B</div>'">`
+        : `<div class="brand-logo-ph">${(b.name || 'B').charAt(0).toUpperCase()}</div>`;
+
+      renderBans(document.getElementById('bansA'), a.bans || []);
+      renderBans(document.getElementById('bansB'), b.bans || []);
+      renderPicks(document.getElementById('picksA'), a.picks || [], 'blue');
+      renderPicks(document.getElementById('picksB'), b.picks || [], 'red');
+
+      const sub = document.getElementById('phaseSub');
+      sub.innerText = (a.name || 'BLUE') + ' ' + scoreA + ' — ' + scoreB + ' ' + (b.name || 'RED');
+
+      if (data.draftState) {
+        document.getElementById('phaseText').innerText = data.draftState.phaseText || 'DRAFT IN PROGRESS';
+        lastTimer = data.draftState.timerSeconds;
+        if (data.draftState.isTimerRunning) startTick(data.draftState.timerSeconds);
+        else tickDisplay(data.draftState.timerSeconds);
+      }
+    }
+
+    let tickTimer = null;
+    function startTick(secs) {
+      stopTick();
+      tickDisplay(secs);
+      tickTimer = setInterval(() => {
+        lastTimer = Math.max(0, lastTimer - 1);
+        tickDisplay(lastTimer);
+        if (lastTimer <= 0) stopTick();
+      }, 1000);
+    }
+    function stopTick() {
+      if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
+    }
+    function tickDisplay(secs) {
+      const el = document.getElementById('phaseTimer');
+      if (el) el.innerText = fmtTimer(secs);
+    }
+
+    async function init() {
+      await loadHeroes();
+      const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}`);
+      ws.onmessage = (e) => {
+        try {
+          const m = JSON.parse(e.data);
+          if (m.type === 'INIT' || m.type === 'UPDATE') renderDraft(m.data);
+        } catch (_) {}
+      };
+      ws.onclose = () => setTimeout(init, 2000);
+      renderDraft(await (await fetch('/api/data')).json());
+    }
+
+    init();
+  </script>
+</body>
+</html>

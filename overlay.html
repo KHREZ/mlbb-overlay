@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLBB In-Game Scoreboard Overlay</title>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #3b82f6;
+      --blue-light: #60a5fa;
+      --blue-glow: rgba(59, 130, 246, 0.8);
+      --red: #ef4444;
+      --red-light: #f87171;
+      --red-glow: rgba(239, 68, 68, 0.8);
+      --gold: #f59e0b;
+      --gold-light: #fbbf24;
+      --gold-glow: rgba(245, 158, 11, 0.7);
+      --bg-dark: #06080f;
+      --bg-panel: #0c1120;
+      --text-dim: #64748b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+    body {
+      width: 1920px; height: 1080px;
+      overflow: hidden;
+      background: transparent;
+      font-family: 'Rajdhani', sans-serif;
+      color: #ffffff;
+    }
+
+    /* ============ TOP SCOREBOARD ============ */
+    .tournament-strip {
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, #0f1420, #1a2332);
+      border: 1px solid rgba(245, 158, 11, 0.55);
+      border-bottom: none;
+      padding: 3px 30px;
+      border-radius: 8px 8px 0 0;
+      font-family: 'Teko'; font-size: 17px; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--gold-light);
+      display: flex; align-items: center; gap: 12px;
+      z-index: 51;
+      animation: stripSlide 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+    }
+    @keyframes stripSlide {
+      from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+      to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+    .tournament-strip .stage { color: #e2e8f0; font-weight: 600; }
+    .tournament-strip .game-num { background: var(--gold); color: #0f1120; padding: 0 9px; border-radius: 4px; font-weight: 700; }
+
+    .top-bar {
+      position: absolute;
+      top: 18px; left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: stretch;
+      z-index: 50;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.85), 0 0 26px rgba(59, 130, 246, 0.18);
+      animation: barSlide 0.7s cubic-bezier(0.2, 0.9, 0.3, 1) 0.1s both;
+    }
+    @keyframes barSlide {
+      from { transform: translateX(-50%) translateY(-30px); opacity: 0; }
+      to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+
+    .team-box { display: flex; align-items: center; gap: 14px; padding: 8px 26px; height: 88px; min-width: 400px; }
+    .team-box.blue {
+      background: linear-gradient(90deg, rgba(30, 58, 138, 0.94) 0%, rgba(13, 20, 38, 0.94) 85%);
+      border-right: 2px solid rgba(59, 130, 246, 0.7);
+      justify-content: flex-start;
+    }
+    .team-box.red {
+      background: linear-gradient(270deg, rgba(127, 29, 29, 0.94) 0%, rgba(24, 13, 20, 0.94) 85%);
+      border-left: 2px solid rgba(239, 68, 68, 0.7);
+      justify-content: flex-end;
+    }
+    .team-box.red .team-info { align-items: flex-end; text-align: right; }
+
+    .team-logo { width: 62px; height: 62px; object-fit: contain; filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.35)); }
+    .team-logo-ph {
+      width: 62px; height: 62px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Teko'; font-size: 30px; font-weight: 700;
+      box-shadow: inset 0 0 14px rgba(255, 255, 255, 0.25);
+    }
+    .team-box.blue .team-logo-ph { background: linear-gradient(135deg, #1d4ed8, #3b82f6); }
+    .team-box.red .team-logo-ph { background: linear-gradient(135deg, #b91c1c, #ef4444); }
+
+    .team-info { display: flex; flex-direction: column; min-width: 170px; }
+    .team-name {
+      font-family: 'Teko'; font-size: 40px; font-weight: 600;
+      letter-spacing: 1.5px; text-transform: uppercase; line-height: 1;
+      white-space: nowrap;
+    }
+    .team-box.blue .team-name { color: #93c5fd; text-shadow: 0 0 14px rgba(96, 165, 250, 0.7); }
+    .team-box.red .team-name { color: #fca5a5; text-shadow: 0 0 14px rgba(248, 113, 113, 0.7); }
+    .series-pips { display: flex; gap: 7px; margin-top: 6px; }
+    .team-box.red .series-pips { flex-direction: row-reverse; }
+    .pip { width: 15px; height: 15px; border-radius: 50%; background: #334155; border: 1px solid rgba(255, 255, 255, 0.25); transition: all 0.3s ease; }
+    .team-box.blue .pip.active { background: var(--blue); box-shadow: 0 0 10px var(--blue); border-color: #bfdbfe; animation: pipGlow 2s ease-in-out infinite; }
+    .team-box.red .pip.active { background: var(--red); box-shadow: 0 0 10px var(--red); border-color: #fecaca; animation: pipGlow 2s ease-in-out infinite; }
+    @keyframes pipGlow { 0%, 100% { box-shadow: 0 0 6px currentColor; } 50% { box-shadow: 0 0 14px currentColor; } }
+
+    .center-stats {
+      width: 560px;
+      background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-panel) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 26px;
+      padding: 0 24px;
+      position: relative;
+    }
+    .center-stats .stat { display: flex; flex-direction: column; align-items: center; min-width: 84px; }
+    .stat-label {
+      font-size: 11px; font-weight: 800;
+      letter-spacing: 2.5px; color: var(--text-dim);
+      text-transform: uppercase;
+    }
+    .stat-value {
+      font-family: 'Teko'; font-size: 40px; font-weight: 600; line-height: 1;
+      margin-top: 2px;
+      transition: color 0.3s ease;
+    }
+    .stat-value.blue { color: var(--blue-light); text-shadow: 0 0 12px var(--blue-glow); }
+    .stat-value.red { color: var(--red-light); text-shadow: 0 0 12px var(--red-glow); }
+    .stat-value.clock { color: var(--gold-light); text-shadow: 0 0 14px var(--gold-glow); font-size: 52px; }
+    .stat-value.small { font-size: 28px; }
+    .kills-wrap { display: flex; align-items: center; gap: 10px; }
+    .kills-sep { font-family: 'Teko'; font-size: 34px; color: #475569; }
+
+    .auto-badge {
+      position: absolute;
+      top: -8px; left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      align-items: center; gap: 6px;
+      background: linear-gradient(90deg, #16a34a, #22c55e);
+      color: #052e16;
+      font-family: 'Teko'; font-size: 14px; font-weight: 700;
+      letter-spacing: 2px;
+      padding: 1px 12px;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 4px 14px rgba(34, 197, 94, 0.5);
+      text-transform: uppercase;
+    }
+    .auto-badge.visible { display: flex; }
+    .auto-badge .adot { width: 8px; height: 8px; border-radius: 50%; background: #052e16; animation: pulse 1.2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    /* ============ OBJECTIVE BANNERS ============ */
+    .obj-banner {
+      position: absolute;
+      top: 150px; left: 50%;
+      transform: translateX(-50%) translateY(-24px);
+      display: none;
+      align-items: center; gap: 16px;
+      padding: 10px 30px;
+      border-radius: 12px;
+      z-index: 80;
+      min-width: 460px;
+      justify-content: center;
+    }
+    .obj-banner.show {
+      display: flex;
+      animation: bannerIn 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards, bannerGlow 2.4s ease-in-out 0.45s infinite, bannerOut 0.5s ease-in forwards 5.6s;
+    }
+    @keyframes bannerIn {
+      from { transform: translateX(-50%) translateY(-30px); opacity: 0; }
+      to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+    @keyframes bannerOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    @keyframes bannerGlow {
+      0%, 100% { box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7); }
+      50% { box-shadow: 0 8px 40px rgba(245, 158, 11, 0.45); }
+    }
+    .obj-banner.warn {
+      background: linear-gradient(90deg, rgba(30, 41, 59, 0.96), rgba(51, 65, 85, 0.96));
+      border: 2px solid rgba(245, 158, 11, 0.8);
+    }
+    .obj-banner.spawn {
+      background: linear-gradient(90deg, rgba(120, 53, 15, 0.96), rgba(245, 158, 11, 0.92) 50%, rgba(120, 53, 15, 0.96));
+      border: 2px solid #fde68a;
+    }
+    .obj-banner.slain {
+      background: linear-gradient(90deg, rgba(30, 27, 75, 0.97), rgba(23, 22, 60, 0.97));
+      border: 2px solid rgba(255, 255, 255, 0.25);
+    }
+    .obj-banner.slain.blue { border-color: rgba(96, 165, 250, 0.9); }
+    .obj-banner.slain.red { border-color: rgba(248, 113, 113, 0.9); }
+    .obj-banner.slain.blue .banner-title { color: #93c5fd; }
+    .obj-banner.slain.red .banner-title { color: #fca5a5; }
+    .obj-banner .banner-icon {
+      width: 58px; height: 58px;
+      clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+      object-fit: cover;
+      background: rgba(15, 23, 42, 0.8);
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+    }
+    .obj-banner .banner-text { display: flex; flex-direction: column; align-items: center; }
+    .banner-title {
+      font-family: 'Teko', sans-serif;
+      font-size: 42px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    .obj-banner.warn .banner-title { color: #fbbf24; }
+    .obj-banner.spawn .banner-title { color: #0f1120; }
+    .banner-sub {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #e2e8f0;
+      margin-top: 3px;
+    }
+    .obj-banner.spawn .banner-sub { color: #451a03; }
+
+    /* ============ OBJECTIVE COUNTDOWN CHIPS ============ */
+    .obj-chips {
+      position: absolute;
+      right: 28px; bottom: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 70;
+      align-items: flex-end;
+    }
+    .obj-chip {
+      display: none;
+      align-items: center; gap: 9px;
+      background: linear-gradient(90deg, rgba(6, 8, 15, 0.94), rgba(15, 23, 42, 0.9));
+      border: 1px solid rgba(245, 158, 11, 0.55);
+      border-radius: 8px;
+      padding: 4px 14px 4px 6px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+    }
+    .obj-chip.visible { display: flex; }
+    .obj-chip .chip-icon {
+      width: 30px; height: 30px;
+      object-fit: cover;
+      clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    }
+    .obj-chip .chip-label {
+      font-family: 'Teko'; font-size: 18px;
+      letter-spacing: 2px; color: #fbbf24;
+      text-transform: uppercase;
+    }
+    .obj-chip .chip-time {
+      font-family: 'Teko'; font-size: 24px;
+      color: #fff; min-width: 58px; text-align: right;
+      text-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+    }
+    .obj-chip.live .chip-time { color: #4ade80; text-shadow: 0 0 12px rgba(74, 222, 128, 0.8); animation: chipPulse 1.4s infinite; }
+    @keyframes chipPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+    .obj-chip.done .chip-time { color: #94a3b8; text-shadow: none; animation: none; }
+  </style>
+</head>
+<body>
+
+  <div class="tournament-strip">
+    <span id="tournamentName">MLBB TOURNAMENT 2026</span>
+    <span>•</span>
+    <span id="matchStage" class="stage">GRAND FINALS</span>
+    <span id="gameNum" class="game-num">GAME 1</span>
+    <span>•</span>
+    <span id="statusText" class="stage">LIVE MATCH</span>
+  </div>
+
+  <div class="top-bar">
+    <div class="team-box blue">
+      <div id="logoA_wrap"></div>
+      <div class="team-info">
+        <div id="teamA_name" class="team-name">TEAM A</div>
+        <div id="pipsA" class="series-pips"></div>
+      </div>
+    </div>
+
+    <div class="center-stats">
+      <div class="auto-badge" id="autoBadge"><div class="adot"></div>AUTO SCORE</div>
+      <div class="stat">
+        <div class="stat-label">Kills</div>
+        <div class="kills-wrap">
+          <div id="blueKills" class="stat-value blue">0</div>
+          <div class="kills-sep">:</div>
+          <div id="redKills" class="stat-value red">0</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Match Time</div>
+        <div id="clock" class="stat-value clock">00:00</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Gold</div>
+        <div class="kills-wrap">
+          <div id="blueGold" class="stat-value small blue">0</div>
+          <div class="kills-sep">:</div>
+          <div id="redGold" class="stat-value small red">0</div>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Turrets</div>
+        <div class="kills-wrap">
+          <div id="blueTurrets" class="stat-value small blue">0</div>
+          <div class="kills-sep">:</div>
+          <div id="redTurrets" class="stat-value small red">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="team-box red">
+      <div class="team-info">
+        <div id="teamB_name" class="team-name">TEAM B</div>
+        <div id="pipsB" class="series-pips"></div>
+      </div>
+      <div id="logoB_wrap"></div>
+    </div>
+  </div>
+
+  <!-- Objective banner -->
+  <div id="objBanner" class="obj-banner">
+    <img id="bannerIcon" class="banner-icon" src="images/objectives/turtle.png" alt="">
+    <div class="banner-text">
+      <div id="bannerTitle" class="banner-title">TURTLE SPAWNING</div>
+      <div id="bannerSub" class="banner-sub"></div>
+    </div>
+  </div>
+
+  <!-- Objective countdown chips -->
+  <div class="obj-chips">
+    <div id="chipTurtle" class="obj-chip">
+      <img class="chip-icon" src="images/objectives/turtle.png" alt="">
+      <span class="chip-label">TURTLE</span>
+      <span id="chipTurtleTime" class="chip-time">--:--</span>
+    </div>
+    <div id="chipLord" class="obj-chip">
+      <img class="chip-icon" src="images/objectives/lord.png" alt="">
+      <span class="chip-label">LORD</span>
+      <span id="chipLordTime" class="chip-time">--:--</span>
+    </div>
+  </div>
+
+  <script>
+    const ICONS = {
+      turtle: 'images/objectives/turtle.png',
+      lord: 'images/objectives/lord.png',
+    };
+    const TITLES = {
+      warn: (o) => `${o.toUpperCase()} INCOMING`,
+      spawn: (o) => `${o.toUpperCase()} SPAWNING`,
+      slain: (o, team) => `${o.toUpperCase()} SLAIN BY ${team.toUpperCase()}`,
+    };
+
+    /* Clock: server-anchored local ticking */
+    let clockAnchor = { secs: 0, at: Date.now(), running: false };
+    let objectives = null;
+    let overlayConfig = null;
+
+    function fmtClock(totalSecs) {
+      totalSecs = Math.max(0, Math.floor(totalSecs));
+      return String(Math.floor(totalSecs / 60)).padStart(2, '0') + ':' + String(totalSecs % 60).padStart(2, '0');
+    }
+
+    function liveSecs() {
+      let secs = clockAnchor.secs;
+      if (clockAnchor.running) secs += (Date.now() - clockAnchor.at) / 1000;
+      return secs;
+    }
+
+    function tickClock() {
+      document.getElementById('clock').innerText = fmtClock(liveSecs());
+      updateChips();
+    }
+    setInterval(tickClock, 500);
+
+    function renderPips(id, score, maxGames) {
+      const wins = Math.ceil(maxGames / 2);
+      let html = '';
+      for (let i = 0; i < wins; i++) html += `<div class="pip${i < score ? ' active' : ''}"></div>`;
+      document.getElementById(id).innerHTML = html;
+    }
+
+    function renderLogo(wrapId, url, name) {
+      const el = document.getElementById(wrapId);
+      const safeName = String(name || '?').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      const safeUrl = String(url || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+      if (url && url.trim()) {
+        el.innerHTML = `<img src="${safeUrl}" class="team-logo" onerror="this.outerHTML='<div class=&quot;team-logo-ph&quot;>${safeName.charAt(0).toUpperCase()}</div>'">`;
+      } else {
+        el.innerHTML = `<div class="team-logo-ph">${safeName.charAt(0).toUpperCase()}</div>`;
+      }
+    }
+
+    /* ---------- Objective banners + chips ---------- */
+    let bannerTimer = null;
+
+    function showBanner(event) {
+      if (!event) return;
+      const banner = document.getElementById('objBanner');
+      const objName = event.objective === 'turtle' ? 'TURTLE' : 'LORD';
+      document.getElementById('bannerIcon').src = ICONS[event.objective];
+      document.getElementById('bannerTitle').innerText = TITLES[event.kind](objName, event.team || '');
+      const sub = document.getElementById('bannerSub');
+      if (event.kind === 'slain') sub.innerText = event.team === 'blue' ? 'BLUE TEAM SECURES THE PRIZE' : 'RED TEAM SECURES THE PRIZE';
+      else if (event.kind === 'warn') sub.innerText = 'PREPARE FOR THE FIGHT';
+      else sub.innerText = event.objective === 'turtle' ? 'GOLD & SHIELD ON THE LINE' : 'PUSH WITH THE LORD';
+
+      banner.className = 'obj-banner ' + event.kind + (event.team ? ' ' + event.team : '') + ' show';
+      if (bannerTimer) clearTimeout(bannerTimer);
+      bannerTimer = setTimeout(() => {
+        banner.classList.remove('show');
+      }, 6400);
+    }
+
+    function updateChips() {
+      if (!objectives) return;
+      const t = liveSecs();
+      const chips = { turtle: document.getElementById('chipTurtle'), lord: document.getElementById('chipLord') };
+      const times = { turtle: document.getElementById('chipTurtleTime'), lord: document.getElementById('chipLordTime') };
+
+      for (const key of ['turtle', 'lord']) {
+        const o = objectives[key];
+        if (!o) continue;
+        const chip = chips[key];
+        const timeEl = times[key];
+        if (o.state === 'spawned') {
+          chip.className = 'obj-chip visible live';
+          timeEl.innerText = 'LIVE';
+        } else if (o.state === 'done') {
+          chip.className = 'obj-chip visible done';
+          timeEl.innerText = 'DONE';
+        } else if (o.state === 'waiting' && objectives.enabled !== false) {
+          const remaining = o.nextSpawn - t;
+          if (remaining <= 0) { timeEl.innerText = 'LIVE'; chip.className = 'obj-chip visible live'; }
+          else { timeEl.innerText = fmtClock(remaining); chip.className = 'obj-chip visible'; }
+        } else {
+          chip.className = 'obj-chip';
+        }
+      }
+    }
+
+    /* ---------- Data ---------- */
+    function updateOverlay(data) {
+      if (!data) return;
+      document.getElementById('tournamentName').innerText = data.tournamentName || 'MLBB TOURNAMENT';
+      document.getElementById('matchStage').innerText = data.matchStage || 'MATCH';
+      document.getElementById('gameNum').innerText = 'GAME ' + (data.currentGame || 1);
+      document.getElementById('statusText').innerText = data.statusText || 'LIVE MATCH';
+
+      const a = data.teamA || {}, b = data.teamB || {};
+      document.getElementById('teamA_name').innerText = a.name || 'TEAM A';
+      document.getElementById('teamB_name').innerText = b.name || 'TEAM B';
+      renderLogo('logoA_wrap', a.logo, a.name);
+      renderLogo('logoB_wrap', b.logo, b.name);
+      const maxGames = parseInt(String(data.matchFormat || 'BO3').replace('BO', '')) || 3;
+      renderPips('pipsA', parseInt(a.score) || 0, maxGames);
+      renderPips('pipsB', parseInt(b.score) || 0, maxGames);
+
+      const lm = data.liveMatch || {};
+      const blue = lm.blue || {}, red = lm.red || {};
+      document.getElementById('blueKills').innerText = blue.kills || 0;
+      document.getElementById('redKills').innerText = red.kills || 0;
+      document.getElementById('blueGold').innerText = blue.gold || 0;
+      document.getElementById('redGold').innerText = red.gold || 0;
+      document.getElementById('blueTurrets').innerText = blue.turrets || 0;
+      document.getElementById('redTurrets').innerText = red.turrets || 0;
+      document.getElementById('autoBadge').classList.toggle('visible', !!lm.autoActive);
+
+      // Customizable stats - respect overlay config
+      const cfg = overlayConfig || {};
+      const showStats = cfg.stats !== false; // default: show all
+      document.querySelectorAll('.stat').forEach(el => el.style.display = 'block');
+      
+      // Apply per-stat visibility if configured (unified path)
+      const vis = cfg.stats || {};
+      if (vis.kills === false) {
+        document.getElementById('blueKills').parentElement.parentElement.style.display = 'none';
+        document.getElementById('redKills').parentElement.parentElement.style.display = 'none';
+      }
+      if (vis.gold === false) {
+        document.getElementById('blueGold').parentElement.parentElement.style.display = 'none';
+        document.getElementById('redGold').parentElement.parentElement.style.display = 'none';
+      }
+      if (vis.turrets === false) {
+        document.getElementById('blueTurrets').parentElement.parentElement.style.display = 'none';
+        document.getElementById('redTurrets').parentElement.parentElement.style.display = 'none';
+      }
+
+      clockAnchor = {
+        secs: lm.timerSeconds || 0,
+        at: Date.now(),
+        running: !!lm.timerRunning,
+      };
+      tickClock();
+
+      if (data.objectives) {
+        objectives = data.objectives;
+        const ev = objectives.lastEvent;
+        if (ev) {
+          const since = Math.abs(liveSecs() - ev.at);
+          if (since < 7) showBanner(ev);
+        }
+        updateChips();
+      }
+    }
+
+    function connectWS() {
+      const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}`);
+      ws.onmessage = (e) => {
+        try {
+          const m = JSON.parse(e.data);
+          if (m.type === 'INIT' || m.type === 'UPDATE') {
+            overlayConfig = (m.data && m.data.overlayConfig) || overlayConfig || {};
+            updateStatVisibility();
+            updateOverlay(m.data);
+          }
+        } catch (_) {}
+      };
+      ws.onclose = () => setTimeout(connectWS, 2000);
+    }
+
+    async function pollData() {
+      try {
+        const d = await (await fetch('/api/data?t=' + Date.now())).json();
+        overlayConfig = d.overlayConfig || overlayConfig || {};
+        updateStatVisibility();
+        updateOverlay(d);
+      } catch (_) {}
+    }
+
+    function updateStatVisibility() {
+      if (!overlayConfig) return;
+      const cfg = overlayConfig.stats || {};
+      document.querySelectorAll('.stat').forEach(el => el.style.display = 'block');
+      if (cfg.kills === false) {
+        document.getElementById('blueKills').parentElement.parentElement.style.display = 'none';
+        document.getElementById('redKills').parentElement.parentElement.style.display = 'none';
+      }
+      if (cfg.gold === false) {
+        document.getElementById('blueGold').parentElement.parentElement.style.display = 'none';
+        document.getElementById('redGold').parentElement.parentElement.style.display = 'none';
+      }
+      if (cfg.turrets === false) {
+        document.getElementById('blueTurrets').parentElement.parentElement.style.display = 'none';
+        document.getElementById('redTurrets').parentElement.parentElement.style.display = 'none';
+      }
+    }
+
+    connectWS();
+    setInterval(pollData, 2000);
+    pollData();
+  </script>
+</body>
+</html>

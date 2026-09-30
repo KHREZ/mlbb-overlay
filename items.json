@@ -1,0 +1,252 @@
+[
+  {
+    "id": "swift_boots",
+    "name": "Swift Boots",
+    "icon": "images/items/swift_boots.png"
+  },
+  {
+    "id": "warrior_boots",
+    "name": "Warrior Boots",
+    "icon": "images/items/warrior_boots.png"
+  },
+  {
+    "id": "rapid_boots",
+    "name": "Rapid Boots",
+    "icon": "images/items/rapid_boots.png"
+  },
+  {
+    "id": "tough_boots",
+    "name": "Tough Boots",
+    "icon": "images/items/tough_boots.png"
+  },
+  {
+    "id": "magic_shoes",
+    "name": "Magic Shoes",
+    "icon": "images/items/magic_shoes.png"
+  },
+  {
+    "id": "demon_shoes",
+    "name": "Demon Shoes",
+    "icon": "images/items/demon_shoes.png"
+  },
+  {
+    "id": "arcane_boots",
+    "name": "Arcane Boots",
+    "icon": "images/items/arcane_boots.png"
+  },
+  {
+    "id": "blade_of_the_heptaseas",
+    "name": "Blade of the Heptaseas",
+    "icon": "images/items/blade_of_the_heptaseas.png"
+  },
+  {
+    "id": "windtalker",
+    "name": "Windtalker",
+    "icon": "images/items/windtalker.png"
+  },
+  {
+    "id": "demon_hunter_sword",
+    "name": "Demon Hunter Sword",
+    "icon": "images/items/demon_hunter_sword.png"
+  },
+  {
+    "id": "scarlet_phantom",
+    "name": "Scarlet Phantom",
+    "icon": "images/items/scarlet_phantom.png"
+  },
+  {
+    "id": "berserker_s_fury",
+    "name": "Berserker's Fury",
+    "icon": "images/items/berserker_s_fury.png"
+  },
+  {
+    "id": "malefic_roar",
+    "name": "Malefic Roar",
+    "icon": "images/items/malefic_roar.png"
+  },
+  {
+    "id": "blade_of_despair",
+    "name": "Blade of Despair",
+    "icon": "images/items/blade_of_despair.png"
+  },
+  {
+    "id": "great_dragon_spear",
+    "name": "Great Dragon Spear",
+    "icon": "images/items/great_dragon_spear.png"
+  },
+  {
+    "id": "queen_s_wings",
+    "name": "Queen's Wings",
+    "icon": "images/items/queen_s_wings.png"
+  },
+  {
+    "id": "hunter_s_strike",
+    "name": "Hunter's Strike",
+    "icon": "images/items/hunter_s_strike.png"
+  },
+  {
+    "id": "war_axe",
+    "name": "War Axe",
+    "icon": "images/items/war_axe.png"
+  },
+  {
+    "id": "endless_battle",
+    "name": "Endless Battle",
+    "icon": "images/items/endless_battle.png"
+  },
+  {
+    "id": "corrosion_scythe",
+    "name": "Corrosion Scythe",
+    "icon": "images/items/corrosion_scythe.png"
+  },
+  {
+    "id": "sea_halberd",
+    "name": "Sea Halberd",
+    "icon": "images/items/sea_halberd.png"
+  },
+  {
+    "id": "wind_of_nature",
+    "name": "Wind of Nature",
+    "icon": "images/items/wind_of_nature.png"
+  },
+  {
+    "id": "feather_of_heaven",
+    "name": "Feather of Heaven",
+    "icon": "images/items/feather_of_heaven.png"
+  },
+  {
+    "id": "glowing_wand",
+    "name": "Glowing Wand",
+    "icon": "images/items/glowing_wand.png"
+  },
+  {
+    "id": "holy_crystal",
+    "name": "Holy Crystal",
+    "icon": "images/items/holy_crystal.png"
+  },
+  {
+    "id": "genius_wand",
+    "name": "Genius Wand",
+    "icon": "images/items/genius_wand.png"
+  },
+  {
+    "id": "lightning_truncheon",
+    "name": "Lightning Truncheon",
+    "icon": "images/items/lightning_truncheon.png"
+  },
+  {
+    "id": "divine_glaive",
+    "name": "Divine Glaive",
+    "icon": "images/items/divine_glaive.png"
+  },
+  {
+    "id": "blood_wings",
+    "name": "Blood Wings",
+    "icon": "images/items/blood_wings.png"
+  },
+  {
+    "id": "concentrated_energy",
+    "name": "Concentrated Energy",
+    "icon": "images/items/concentrated_energy.png"
+  },
+  {
+    "id": "ice_queen_wand",
+    "name": "Ice Queen Wand",
+    "icon": "images/items/ice_queen_wand.png"
+  },
+  {
+    "id": "enchanted_talisman",
+    "name": "Enchanted Talisman",
+    "icon": "images/items/enchanted_talisman.png"
+  },
+  {
+    "id": "necklace_of_durance",
+    "name": "Necklace of Durance",
+    "icon": "images/items/necklace_of_durance.png"
+  },
+  {
+    "id": "clock_of_destiny",
+    "name": "Clock of Destiny",
+    "icon": "images/items/clock_of_destiny.png"
+  },
+  {
+    "id": "antique_cuirass",
+    "name": "Antique Cuirass",
+    "icon": "images/items/antique_cuirass.png"
+  },
+  {
+    "id": "blade_armor",
+    "name": "Blade Armor",
+    "icon": "images/items/blade_armor.png"
+  },
+  {
+    "id": "dominance_ice",
+    "name": "Dominance Ice",
+    "icon": "images/items/dominance_ice.png"
+  },
+  {
+    "id": "athena_s_shield",
+    "name": "Athena's Shield",
+    "icon": "images/items/athena_s_shield.png"
+  },
+  {
+    "id": "twilight_armor",
+    "name": "Twilight Armor",
+    "icon": "images/items/twilight_armor.png"
+  },
+  {
+    "id": "guardian_helmet",
+    "name": "Guardian Helmet",
+    "icon": "images/items/guardian_helmet.png"
+  },
+  {
+    "id": "cursed_helmet",
+    "name": "Cursed Helmet",
+    "icon": "images/items/cursed_helmet.png"
+  },
+  {
+    "id": "oracle",
+    "name": "Oracle",
+    "icon": "images/items/oracle.png"
+  },
+  {
+    "id": "radiant_armor",
+    "name": "Radiant Armor",
+    "icon": "images/items/radiant_armor.png"
+  },
+  {
+    "id": "brute_force_breastplate",
+    "name": "Brute Force Breastplate",
+    "icon": "images/items/brute_force_breastplate.png"
+  },
+  {
+    "id": "immortality",
+    "name": "Immortality",
+    "icon": "images/items/immortality.png"
+  },
+  {
+    "id": "winter_truncheon",
+    "name": "Winter Truncheon",
+    "icon": "images/items/winter_truncheon.png"
+  },
+  {
+    "id": "rose_gold_meteor",
+    "name": "Rose Gold Meteor",
+    "icon": "images/items/rose_gold_meteor.png"
+  },
+  {
+    "id": "thunder_belt",
+    "name": "Thunder Belt",
+    "icon": "images/items/thunder_belt.png"
+  },
+  {
+    "id": "courage_bulwark",
+    "name": "Courage Bulwark",
+    "icon": "images/items/courage_bulwark.png"
+  },
+  {
+    "id": "shadow_mask",
+    "name": "Shadow Mask",
+    "icon": "images/items/shadow_mask.png"
+  }
+]

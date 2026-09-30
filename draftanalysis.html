@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLBB Draft Analysis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #3b82f6;
+      --red: #ef4444;
+      --gold: #f59e0b;
+      --bg: #06080f;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      width: 1920px; height: 1080px;
+      overflow: hidden;
+      background: transparent;
+      font-family: 'Rajdhani', sans-serif;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .analysis-container {
+      display: flex;
+      gap: 40px;
+      align-items: stretch;
+    }
+
+    .draft-panel {
+      width: 820px;
+      background: linear-gradient(160deg, rgba(12, 16, 28, 0.97), rgba(24, 30, 46, 0.95));
+      border: 2px solid rgba(245, 158, 11, 0.3);
+      border-radius: 18px;
+      padding: 30px;
+      opacity: 0;
+      animation: fadeIn 0.7s ease both;
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    .panel-title {
+      font-family: 'Teko';
+      font-size: 32px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      text-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+    }
+
+    .comp-section {
+      margin-bottom: 18px;
+    }
+    .comp-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+    }
+
+    .role-coverage {
+      display: flex;
+      gap: 10px;
+    }
+    .role-badge {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-family: 'Teko';
+      font-size: 17px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .role-badge.filled {
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.5);
+      color: #4ade80;
+    }
+    .role-badge.missing {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      color: #f87171;
+      animation: missingPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes missingPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .synergy-bar {
+      margin-top: 16px;
+    }
+    .synergy-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 6px;
+    }
+    .synergy-track {
+      height: 24px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+    .synergy-fill {
+      height: 100%;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #dc2626, #f59e0b, #22c55e);
+      transition: width 0.8s ease;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 10px;
+      font-family: 'Teko';
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .pick-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 12px;
+    }
+    .pick-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 6px;
+    }
+    .pick-item .hero-name {
+      font-family: 'Teko';
+      font-size: 19px;
+      color: var(--gold);
+      min-width: 120px;
+    }
+    .pick-item .pick-role {
+      font-size: 13px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .pick-item .pick-player {
+      font-size: 14px;
+      font-weight: 700;
+      color: #94a3b8;
+      margin-left: auto;
+    }
+
+    .win-prob {
+      text-align: center;
+      margin-top: 20px;
+      padding: 16px;
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 12px;
+    }
+    .win-prob-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .win-prob-value {
+      font-family: 'Teko';
+      font-size: 48px;
+      color: var(--gold);
+      text-shadow: 0 0 16px rgba(245, 158, 11, 0.6);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="analysis-container">
+    <div id="analysisA" class="draft-panel"></div>
+    <div id="analysisB" class="draft-panel"></div>
+  </div>
+
+  <script>
+    const ROLES = ['EXP', 'Jungle', 'Mid', 'Gold', 'Roam'];
+
+    function analyzeComp(picks) {
+      const filled = ROLES.filter(r => picks.some(p => p.role === r));
+      const missing = ROLES.filter(r => !picks.some(p => p.role === r));
+      const coverage = Math.round((filled.length / 5) * 100);
+      const pickCount = picks.filter(p => p.hero).length;
+      return { filled, missing, coverage, pickCount };
+    }
+
+    function renderAnalysis(el, team, side) {
+      const picks = team.picks || [];
+      const comp = analyzeComp(picks);
+
+      el.innerHTML = `
+        <div class="panel-title">${team.name || 'TEAM'} — Draft Analysis</div>
+
+        <div class="comp-section">
+          <div class="comp-label">Role Coverage (${comp.filled.length}/5)</div>
+          <div class="role-coverage">
+            ${ROLES.map(r => `
+              <div class="role-badge ${comp.filled.includes(r) ? 'filled' : 'missing'}">${r}</div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="comp-section">
+          <div class="synergy-label">Composition Rating</div>
+          <div class="synergy-bar">
+            <div class="synergy-track">
+              <div class="synergy-fill" style="width: ${comp.coverage}%">${comp.coverage}%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comp-section">
+          <div class="comp-label">Picks (${comp.pickCount}/5)</div>
+          <div class="pick-list">
+            ${picks.map((p, i) => `
+              <div class="pick-item">
+                <span class="hero-name">${p.hero || '—'}</span>
+                <span class="pick-role">${p.role || '—'}</span>
+                <span class="pick-player">${p.player || ''}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="comp-section">
+          <div class="comp-label">Bans (${(team.bans || []).filter(Boolean).length})</div>
+          <div class="pick-list">
+            ${(team.bans || []).filter(Boolean).map(b => `
+              <div class="pick-item">
+                <span class="hero-name">${b}</span>
+                <span class="pick-role">BANNED</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function render(data) {
+      if (!data) return;
+      renderAnalysis(document.getElementById('analysisA'), data.teamA || {}, 'blue');
+      renderAnalysis(document.getElementById('analysisB'), data.teamB || {}, 'red');
+    }
+
+    async function init() {
+      const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}`);
+      ws.onmessage = (e) => {
+        try {
+          const m = JSON.parse(e.data);
+          if (m.type === 'INIT' || m.type === 'UPDATE') render(m.data);
+        } catch (_) {}
+      };
+      ws.onclose = () => setTimeout(init, 2000);
+      render(await (await fetch('/api/data')).json());
+    }
+
+    init();
+  </script>
+</body>
+</html>

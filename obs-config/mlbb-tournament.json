@@ -1,0 +1,1157 @@
+{
+  "name": "MLBB Tournament",
+  "DesktopAudioDevice1": {
+    "prev_ver": 537001985,
+    "name": "Desktop Audio",
+    "uuid": "4934a624-3eee-4193-a1f4-865aa7b1605c",
+    "id": "pulse_output_capture",
+    "versioned_id": "pulse_output_capture",
+    "settings": {
+      "device_id": "default"
+    },
+    "mixers": 255,
+    "sync": 0,
+    "flags": 0,
+    "volume": 1,
+    "balance": 0.5,
+    "enabled": true,
+    "muted": false,
+    "push-to-mute": false,
+    "push-to-mute-delay": 0,
+    "push-to-talk": false,
+    "push-to-talk-delay": 0,
+    "hotkeys": {
+      "libobs.mute": [],
+      "libobs.unmute": [],
+      "libobs.push-to-mute": [],
+      "libobs.push-to-talk": []
+    },
+    "deinterlace_mode": 0,
+    "deinterlace_field_order": 0,
+    "monitoring_type": 0,
+    "private_settings": {}
+  },
+  "AuxAudioDevice1": {
+    "prev_ver": 537001985,
+    "name": "Mic/Aux",
+    "uuid": "d8b052ab-fed9-456f-a2e4-83b3d818fa1e",
+    "id": "pulse_input_capture",
+    "versioned_id": "pulse_input_capture",
+    "settings": {
+      "device_id": "default"
+    },
+    "mixers": 255,
+    "sync": 0,
+    "flags": 0,
+    "volume": 1,
+    "balance": 0.5,
+    "enabled": true,
+    "muted": false,
+    "push-to-mute": false,
+    "push-to-mute-delay": 0,
+    "push-to-talk": false,
+    "push-to-talk-delay": 0,
+    "hotkeys": {
+      "libobs.mute": [],
+      "libobs.unmute": [],
+      "libobs.push-to-mute": [],
+      "libobs.push-to-talk": []
+    },
+    "deinterlace_mode": 0,
+    "deinterlace_field_order": 0,
+    "monitoring_type": 0,
+    "private_settings": {}
+  },
+  "sources": [
+    {
+      "prev_ver": 537001985,
+      "name": "Scoreboard",
+      "uuid": "5d5688b5-a0a5-4575-9d6c-c242c6196837",
+      "id": "browser_source",
+      "versioned_id": "browser_source",
+      "settings": {
+        "url": "http://localhost:3000/overlay.html",
+        "width": 1920,
+        "height": 1080,
+        "fps": 60,
+        "fps_custom": true,
+        "shutdown": false,
+        "restart_when_active": false,
+        "ignore_web_cert_errors": false,
+        "reroute_audio": true
+      },
+      "mixers": 255,
+      "sync": 0,
+      "flags": 0,
+      "volume": 1,
+      "balance": 0.5,
+      "enabled": true,
+      "muted": false,
+      "push-to-mute": false,
+      "push-to-mute-delay": 0,
+      "push-to-talk": false,
+      "push-to-talk-delay": 0,
+      "hotkeys": {
+        "libobs.mute": [],
+        "libobs.unmute": [],
+        "OBSBrowser.Refresh": []
+      },
+      "deinterlace_mode": 0,
+      "deinterlace_field_order": 0,
+      "monitoring_type": 0,
+      "private_settings": {}
+    },
+    {
+      "prev_ver": 537001985,
+      "name": "Draft Overlay",
+      "uuid": "d214ab16-d8ce-41f1-a999-2ee2729b13cd",
+      "id": "browser_source",
+      "versioned_id": "browser_source",
+      "settings": {
+        "url": "http://localhost:3000/draft.html",
+        "width": 1920,
+        "height": 1080,
+        "fps": 60,
+        "fps_custom": true,
+        "shutdown": false,
+        "restart_when_active": false,
+        "ignore_web_cert_errors": false,
+        "reroute_audio": true
+      },
+      "mixers": 255,
+      "sync": 0,
+      "flags": 0,
+      "volume": 1,
+      "balance": 0.5,
+      "enabled": true,
+      "muted": false,
+      "push-to-mute": false,
+      "push-to-mute-delay": 0,
+      "push-to-talk": false,
+      "push-to-talk-delay": 0,
+      "hotkeys": {
+        "libobs.mute": [],
+        "libobs.unmute": [],
+        "OBSBrowser.Refresh": []
+      },
+      "deinterlace_mode": 0,
+      "deinterlace_field_order": 0,
+      "monitoring_type": 0,
+      "private_settings": {}
+    },
+    {
+      "prev_ver": 537001985,
+      "name": "Casters Overlay",
+      "uuid": "9ab55f32-d12e-4b48-ab46-dd3a32fdd7b7",
+      "id": "browser_source",
+      "versioned_id": "browser_source",
+      "settings": {
+        "url": "http://localhost:3000/casters.html",
+        "width": 1920,
+        "height": 1080,
+        "fps": 60,
+        "fps_custom": true,
+        "shutdown": false,
+        "restart_when_active": false,
+        "ignore_web_cert_errors": false,
+        "reroute_audio": true
+      },
+      "mixers": 255,
+      "sync": 0,
+      "flags": 0,
+      "volume": 1,
+      "balance": 0.5,
+      "enabled": true,
+      "muted": false,
+      "push-to-mute": false,
+      "push-to-mute-delay": 0,
+      "push-to-talk": false,
+      "push-to-talk-delay": 0,
+      "hotkeys": {
+        "libobs.mute": [],
+        "libobs.unmute": [],
+        "OBSBrowser.Refresh": []
+      },
+      "deinterlace_mode": 0,
+      "deinterlace_field_order": 0,
+      "monitoring_type": 0,
+      "private_settings": {}
+    },
+    {
+      "prev_ver": 537001985,
+      "name": "MVP Overlay",
+      "uuid": "68a02a53-8d8f-4da9-a311-bbe269f2e8ad",
+      "id": "browser_source",
+      "versioned_id": "browser_source",
+      "settings": {
+        "url": "http://localhost:3000/mvp.html",
+        "width": 1920,
+        "height": 1080,
+        "fps": 60,
+        "fps_custom": true,
+        "shutdown": false,
+        "restart_when_active": false,
+        "ignore_web_cert_errors": false,
+        "reroute_audio": true
+      },
+      "mixers": 255,
+      "sync": 0,
+      "flags": 0,
+      "volume": 1,
+      "balance": 0.5,
+      "enabled": true,
+      "muted": false,
+      "push-to-mute": false,
+      "push-to-mute-delay": 0,
+      "push-to-talk": false,
+      "push-to-talk-delay": 0,
+      "hotkeys": {
+        "libobs.mute": [],
+        "libobs.unmute": [],
+        "OBSBrowser.Refresh": []
+      },
+      "deinterlace_mode": 0,
+      "deinterlace_field_order": 0,
+      "monitoring_type": 0,
+      "private_settings": {}
+    },
+    {
+      "prev_ver": 537001985,
+      "name": "Intro Overlay",
+      "uuid": "d3ccad9e-a7d3-4c4a-be84-762876b84ed5",
+      "id": "browser_source",
+      "versioned_id": "browser_source",
+      "settings": {
+        "url": "http://localhost:3000/intro.html",
+        "width": 1920,
+        "height": 1080,
+        "fps": 60,
+        "fps_custom": true,
+        "shutdown": false,
+        "restart_when_active": false,
+        "ignore_web_cert_errors": false,
+        "reroute_audio": true
+      },
+      "mixers": 255,
+      "sync": 0,
+      "flags": 0,
+      "volume": 1,
+      "balance": 0.5,
+      "enabled": true,
+      "muted": false,
+      "push-to-mute": false,
+      "push-to-mute-delay": 0,
+      "push-to-talk": false,
+      "push-to-talk-delay": 0,
+      "hotkeys": {
+        "libobs.mute": [],
+        "libobs.unmute": [],
+        "OBSBrowser.Refresh": []
+      },
+      "deinterlace_mode": 0,
+      "deinterlace_field_order": 0,
+      "monitoring_type": 0,
+      "private_settings": {}
+    },
+    {
+      "prev_ver": 537001985,
+      "name": "BRB Overlay",
+      "uuid": "c99bdf0b-b6bc-4771-877e-f9e78f76f969",
+      "id": "browser_source",
+      "versioned_id": "browser_source",
+      "settings": {
+        "url": "http://localhost:3000/brb.html",
+        "width": 1920,
+        "height": 1080,
+        "fps": 60,
+        "fps_custom": true,
+        "shutdown": false,
+        "restart_when_active": false,
+        "ignore_web_cert_errors": false,
+        "reroute_audio": true
+      },
+      "mixers": 255,
+      "sync": 0,
+      "flags": 0,
+      "volume": 1,
+      "balance": 0.5,
+      "enabled": true,
+      "muted": false,
+      "push-to-mute": false,
+      "push-to-mute-delay": 0,
+      "push-to-talk": false,
+      "push-to-talk-delay": 0,
+      "hotkeys": {
+        "libobs.mute": [],
+        "libobs.unmute": [],
+        "OBSBrowser.Refresh": []
+      },
+      "deinterlace_mode": 0,
+      "deinterlace_field_order": 0,
+      "monitoring_type": 0,
+      "private_settings": {}
+    },
+    {
+      "prev_ver": 537001985,
+      "name": "scrcpy - Phone",
+      "uuid": "e465b96b-bd41-4aac-a529-bf2024334931",
+      "id": "pipewire-window-capture-source",
+      "versioned_id": "pipewire-window-capture-source",
+      "settings": {
+        "cursor_mode": 1
+      },
+      "mixers": 255,
+      "sync": 0,
+      "flags": 0,
+      "volume": 1,
+      "balance": 0.5,
+      "enabled": true,
+      "muted": false,
+      "push-to-mute": false,
+      "push-to-mute-delay": 0,
+      "push-to-talk": false,
+      "push-to-talk-delay": 0,
+      "hotkeys": {
+        "libobs.mute": [],
+        "libobs.unmute": []
+      },
+      "deinterlace_mode": 0,
+      "deinterlace_field_order": 0,
+      "monitoring_type": 0,
+      "private_settings": {}
+    },
+    {
+      "prev_ver": 1,
+      "name": "Webcam",
+      "uuid": "3fbf2a98-bfac-4073-aa98-4b024847b440",
+      "id": "v4l2_input",
+      "versioned_id": "v4l2_input",
+      "settings": {
+        "device_id": ""
+      },
+      "mixers": 255,
+      "sync": 0,
+      "flags": 0,
+      "volume": 1,
+      "balance": 0.5,
+      "enabled": true,
+      "muted": false,
+      "push-to-mute": false,
+      "push-to-mute-delay": 0,
+      "push-to-talk": false,
+      "push-to-talk-delay": 0,
+      "hotkeys": {
+        "libobs.mute": [],
+        "libobs.unmute": []
+      },
+      "deinterlace_mode": 0,
+      "deinterlace_field_order": 0,
+      "monitoring_type": 0,
+      "private_settings": {}
+    },
+    {
+      "prev_ver": 537001985,
+      "name": "INTRO / BREAK",
+      "uuid": "3541bbc6-8c74-40e5-9685-a5b946d7db3e",
+      "id": "scene",
+      "versioned_id": "scene",
+      "settings": {
+        "id_counter": 100,
+        "custom_size": false,
+        "items": [
+          {
+            "name": "Intro Overlay",
+            "source_uuid": "d3ccad9e-a7d3-4c4a-be84-762876b84ed5",
+            "visible": true,
+            "locked": false,
+            "rot": 0,
+            "scale_ref": {
+              "x": 1920,
+              "y": 1080
+            },
+            "align": 5,
+            "bounds_type": 2,
+            "bounds_align": 0,
+            "bounds_crop": false,
+            "crop_left": 0,
+            "crop_top": 0,
+            "crop_right": 0,
+            "crop_bottom": 0,
+            "id": 1,
+            "group_item_backup": false,
+            "pos": {
+              "x": 0,
+              "y": 0
+            },
+            "pos_rel": {
+              "x": 0,
+              "y": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1
+            },
+            "scale_rel": {
+              "x": 1,
+              "y": 1
+            },
+            "bounds": {
+              "x": 1920,
+              "y": 1080
+            },
+            "bounds_rel": {
+              "x": 1,
+              "y": 1
+            },
+            "scale_filter": "disable",
+            "blend_method": "default",
+            "blend_type": "normal",
+            "show_transition": {
+              "duration": 300
+            },
+            "hide_transition": {
+              "duration": 300
+            },
+            "private_settings": {}
+          }
+        ]
+      },
+      "mixers": 0,
+      "sync": 0,
+      "flags": 0,
+      "volume": 1,
+      "balance": 0.5,
+      "enabled": true,
+      "muted": false,
+      "push-to-mute": false,
+      "push-to-mute-delay": 0,
+      "push-to-talk": false,
+      "push-to-talk-delay": 0,
+      "hotkeys": {
+        "OBSBasic.SelectScene": []
+      },
+      "deinterlace_mode": 0,
+      "deinterlace_field_order": 0,
+      "monitoring_type": 0,
+      "canvas_uuid": "6c69626f-6273-4c00-9d88-c5136d61696e",
+      "private_settings": {}
+    },
+    {
+      "prev_ver": 537001985,
+      "name": "DRAFT",
+      "uuid": "0807e9db-8a21-47af-acbc-e321ec5de741",
+      "id": "scene",
+      "versioned_id": "scene",
+      "settings": {
+        "id_counter": 100,
+        "custom_size": false,
+        "items": [
+          {
+            "name": "Draft Overlay",
+            "source_uuid": "d214ab16-d8ce-41f1-a999-2ee2729b13cd",
+            "visible": true,
+            "locked": false,
+            "rot": 0,
+            "scale_ref": {
+              "x": 1920,
+              "y": 1080
+            },
+            "align": 5,
+            "bounds_type": 2,
+            "bounds_align": 0,
+            "bounds_crop": false,
+            "crop_left": 0,
+            "crop_top": 0,
+            "crop_right": 0,
+            "crop_bottom": 0,
+            "id": 1,
+            "group_item_backup": false,
+            "pos": {
+              "x": 0,
+              "y": 0
+            },
+            "pos_rel": {
+              "x": 0,
+              "y": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1
+            },
+            "scale_rel": {
+              "x": 1,
+              "y": 1
+            },
+            "bounds": {
+              "x": 1920,
+              "y": 1080
+            },
+            "bounds_rel": {
+              "x": 1,
+              "y": 1
+            },
+            "scale_filter": "disable",
+            "blend_method": "default",
+            "blend_type": "normal",
+            "show_transition": {
+              "duration": 300
+            },
+            "hide_transition": {
+              "duration": 300
+            },
+            "private_settings": {}
+          },
+          {
+            "name": "scrcpy - Phone",
+            "source_uuid": "e465b96b-bd41-4aac-a529-bf2024334931",
+            "visible": true,
+            "locked": false,
+            "rot": 0,
+            "scale_ref": {
+              "x": 620,
+              "y": 1080
+            },
+            "align": 5,
+            "bounds_type": 2,
+            "bounds_align": 0,
+            "bounds_crop": false,
+            "crop_left": 0,
+            "crop_top": 0,
+            "crop_right": 0,
+            "crop_bottom": 0,
+            "id": 2,
+            "group_item_backup": false,
+            "pos": {
+              "x": 650,
+              "y": 0
+            },
+            "pos_rel": {
+              "x": 0.3385416666666667,
+              "y": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1
+            },
+            "scale_rel": {
+              "x": 1,
+              "y": 1
+            },
+            "bounds": {
+              "x": 620,
+              "y": 1080
+            },
+            "bounds_rel": {
+              "x": 0.3229166666666667,
+              "y": 1
+            },
+            "scale_filter": "disable",
+            "blend_method": "default",
+            "blend_type": "normal",
+            "show_transition": {
+              "duration": 300
+            },
+            "hide_transition": {
+              "duration": 300
+            },
+            "private_settings": {}
+          }
+        ]
+      },
+      "mixers": 0,
+      "sync": 0,
+      "flags": 0,
+      "volume": 1,
+      "balance": 0.5,
+      "enabled": true,
+      "muted": false,
+      "push-to-mute": false,
+      "push-to-mute-delay": 0,
+      "push-to-talk": false,
+      "push-to-talk-delay": 0,
+      "hotkeys": {
+        "OBSBasic.SelectScene": []
+      },
+      "deinterlace_mode": 0,
+      "deinterlace_field_order": 0,
+      "monitoring_type": 0,
+      "canvas_uuid": "6c69626f-6273-4c00-9d88-c5136d61696e",
+      "private_settings": {}
+    },
+    {
+      "prev_ver": 537001985,
+      "name": "LIVE MATCH",
+      "uuid": "0fd29144-14d6-4e00-b737-dcfd2ac2231f",
+      "id": "scene",
+      "versioned_id": "scene",
+      "settings": {
+        "id_counter": 100,
+        "custom_size": false,
+        "items": [
+          {
+            "name": "scrcpy - Phone",
+            "source_uuid": "e465b96b-bd41-4aac-a529-bf2024334931",
+            "visible": true,
+            "locked": false,
+            "rot": 0,
+            "scale_ref": {
+              "x": 620,
+              "y": 1080
+            },
+            "align": 5,
+            "bounds_type": 2,
+            "bounds_align": 0,
+            "bounds_crop": false,
+            "crop_left": 0,
+            "crop_top": 0,
+            "crop_right": 0,
+            "crop_bottom": 0,
+            "id": 1,
+            "group_item_backup": false,
+            "pos": {
+              "x": 650,
+              "y": 0
+            },
+            "pos_rel": {
+              "x": 0.3385416666666667,
+              "y": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1
+            },
+            "scale_rel": {
+              "x": 1,
+              "y": 1
+            },
+            "bounds": {
+              "x": 620,
+              "y": 1080
+            },
+            "bounds_rel": {
+              "x": 0.3229166666666667,
+              "y": 1
+            },
+            "scale_filter": "disable",
+            "blend_method": "default",
+            "blend_type": "normal",
+            "show_transition": {
+              "duration": 300
+            },
+            "hide_transition": {
+              "duration": 300
+            },
+            "private_settings": {}
+          },
+          {
+            "name": "Scoreboard",
+            "source_uuid": "5d5688b5-a0a5-4575-9d6c-c242c6196837",
+            "visible": true,
+            "locked": false,
+            "rot": 0,
+            "scale_ref": {
+              "x": 1920,
+              "y": 1080
+            },
+            "align": 5,
+            "bounds_type": 2,
+            "bounds_align": 0,
+            "bounds_crop": false,
+            "crop_left": 0,
+            "crop_top": 0,
+            "crop_right": 0,
+            "crop_bottom": 0,
+            "id": 2,
+            "group_item_backup": false,
+            "pos": {
+              "x": 0,
+              "y": 0
+            },
+            "pos_rel": {
+              "x": 0,
+              "y": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1
+            },
+            "scale_rel": {
+              "x": 1,
+              "y": 1
+            },
+            "bounds": {
+              "x": 1920,
+              "y": 1080
+            },
+            "bounds_rel": {
+              "x": 1,
+              "y": 1
+            },
+            "scale_filter": "disable",
+            "blend_method": "default",
+            "blend_type": "normal",
+            "show_transition": {
+              "duration": 300
+            },
+            "hide_transition": {
+              "duration": 300
+            },
+            "private_settings": {}
+          }
+        ]
+      },
+      "mixers": 0,
+      "sync": 0,
+      "flags": 0,
+      "volume": 1,
+      "balance": 0.5,
+      "enabled": true,
+      "muted": false,
+      "push-to-mute": false,
+      "push-to-mute-delay": 0,
+      "push-to-talk": false,
+      "push-to-talk-delay": 0,
+      "hotkeys": {
+        "OBSBasic.SelectScene": []
+      },
+      "deinterlace_mode": 0,
+      "deinterlace_field_order": 0,
+      "monitoring_type": 0,
+      "canvas_uuid": "6c69626f-6273-4c00-9d88-c5136d61696e",
+      "private_settings": {}
+    },
+    {
+      "prev_ver": 537001985,
+      "name": "CASTERS",
+      "uuid": "5f96806d-8c13-4fd8-be26-f362b582eaa0",
+      "id": "scene",
+      "versioned_id": "scene",
+      "settings": {
+        "id_counter": 100,
+        "custom_size": false,
+        "items": [
+          {
+            "name": "Webcam",
+            "source_uuid": "3fbf2a98-bfac-4073-aa98-4b024847b440",
+            "visible": true,
+            "locked": false,
+            "rot": 0,
+            "scale_ref": {
+              "x": 640,
+              "y": 360
+            },
+            "align": 5,
+            "bounds_type": 2,
+            "bounds_align": 0,
+            "bounds_crop": false,
+            "crop_left": 0,
+            "crop_top": 0,
+            "crop_right": 0,
+            "crop_bottom": 0,
+            "id": 1,
+            "group_item_backup": false,
+            "pos": {
+              "x": 60,
+              "y": 120
+            },
+            "pos_rel": {
+              "x": 0.03125,
+              "y": 0.1111111111111111
+            },
+            "scale": {
+              "x": 1,
+              "y": 1
+            },
+            "scale_rel": {
+              "x": 1,
+              "y": 1
+            },
+            "bounds": {
+              "x": 640,
+              "y": 360
+            },
+            "bounds_rel": {
+              "x": 0.3333333333333333,
+              "y": 0.3333333333333333
+            },
+            "scale_filter": "disable",
+            "blend_method": "default",
+            "blend_type": "normal",
+            "show_transition": {
+              "duration": 300
+            },
+            "hide_transition": {
+              "duration": 300
+            },
+            "private_settings": {}
+          },
+          {
+            "name": "Casters Overlay",
+            "source_uuid": "9ab55f32-d12e-4b48-ab46-dd3a32fdd7b7",
+            "visible": true,
+            "locked": false,
+            "rot": 0,
+            "scale_ref": {
+              "x": 1920,
+              "y": 1080
+            },
+            "align": 5,
+            "bounds_type": 2,
+            "bounds_align": 0,
+            "bounds_crop": false,
+            "crop_left": 0,
+            "crop_top": 0,
+            "crop_right": 0,
+            "crop_bottom": 0,
+            "id": 2,
+            "group_item_backup": false,
+            "pos": {
+              "x": 0,
+              "y": 0
+            },
+            "pos_rel": {
+              "x": 0,
+              "y": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1
+            },
+            "scale_rel": {
+              "x": 1,
+              "y": 1
+            },
+            "bounds": {
+              "x": 1920,
+              "y": 1080
+            },
+            "bounds_rel": {
+              "x": 1,
+              "y": 1
+            },
+            "scale_filter": "disable",
+            "blend_method": "default",
+            "blend_type": "normal",
+            "show_transition": {
+              "duration": 300
+            },
+            "hide_transition": {
+              "duration": 300
+            },
+            "private_settings": {}
+          }
+        ]
+      },
+      "mixers": 0,
+      "sync": 0,
+      "flags": 0,
+      "volume": 1,
+      "balance": 0.5,
+      "enabled": true,
+      "muted": false,
+      "push-to-mute": false,
+      "push-to-mute-delay": 0,
+      "push-to-talk": false,
+      "push-to-talk-delay": 0,
+      "hotkeys": {
+        "OBSBasic.SelectScene": []
+      },
+      "deinterlace_mode": 0,
+      "deinterlace_field_order": 0,
+      "monitoring_type": 0,
+      "canvas_uuid": "6c69626f-6273-4c00-9d88-c5136d61696e",
+      "private_settings": {}
+    },
+    {
+      "prev_ver": 537001985,
+      "name": "MVP",
+      "uuid": "a7987f12-33c7-4bd2-92f5-98ccb9e03f68",
+      "id": "scene",
+      "versioned_id": "scene",
+      "settings": {
+        "id_counter": 100,
+        "custom_size": false,
+        "items": [
+          {
+            "name": "scrcpy - Phone",
+            "source_uuid": "e465b96b-bd41-4aac-a529-bf2024334931",
+            "visible": true,
+            "locked": false,
+            "rot": 0,
+            "scale_ref": {
+              "x": 1920,
+              "y": 1080
+            },
+            "align": 5,
+            "bounds_type": 2,
+            "bounds_align": 0,
+            "bounds_crop": false,
+            "crop_left": 0,
+            "crop_top": 0,
+            "crop_right": 0,
+            "crop_bottom": 0,
+            "id": 1,
+            "group_item_backup": false,
+            "pos": {
+              "x": 0,
+              "y": 0
+            },
+            "pos_rel": {
+              "x": 0,
+              "y": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1
+            },
+            "scale_rel": {
+              "x": 1,
+              "y": 1
+            },
+            "bounds": {
+              "x": 1920,
+              "y": 1080
+            },
+            "bounds_rel": {
+              "x": 1,
+              "y": 1
+            },
+            "scale_filter": "disable",
+            "blend_method": "default",
+            "blend_type": "normal",
+            "show_transition": {
+              "duration": 300
+            },
+            "hide_transition": {
+              "duration": 300
+            },
+            "private_settings": {}
+          },
+          {
+            "name": "MVP Overlay",
+            "source_uuid": "68a02a53-8d8f-4da9-a311-bbe269f2e8ad",
+            "visible": true,
+            "locked": false,
+            "rot": 0,
+            "scale_ref": {
+              "x": 1920,
+              "y": 1080
+            },
+            "align": 5,
+            "bounds_type": 2,
+            "bounds_align": 0,
+            "bounds_crop": false,
+            "crop_left": 0,
+            "crop_top": 0,
+            "crop_right": 0,
+            "crop_bottom": 0,
+            "id": 2,
+            "group_item_backup": false,
+            "pos": {
+              "x": 0,
+              "y": 0
+            },
+            "pos_rel": {
+              "x": 0,
+              "y": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1
+            },
+            "scale_rel": {
+              "x": 1,
+              "y": 1
+            },
+            "bounds": {
+              "x": 1920,
+              "y": 1080
+            },
+            "bounds_rel": {
+              "x": 1,
+              "y": 1
+            },
+            "scale_filter": "disable",
+            "blend_method": "default",
+            "blend_type": "normal",
+            "show_transition": {
+              "duration": 300
+            },
+            "hide_transition": {
+              "duration": 300
+            },
+            "private_settings": {}
+          }
+        ]
+      },
+      "mixers": 0,
+      "sync": 0,
+      "flags": 0,
+      "volume": 1,
+      "balance": 0.5,
+      "enabled": true,
+      "muted": false,
+      "push-to-mute": false,
+      "push-to-mute-delay": 0,
+      "push-to-talk": false,
+      "push-to-talk-delay": 0,
+      "hotkeys": {
+        "OBSBasic.SelectScene": []
+      },
+      "deinterlace_mode": 0,
+      "deinterlace_field_order": 0,
+      "monitoring_type": 0,
+      "canvas_uuid": "6c69626f-6273-4c00-9d88-c5136d61696e",
+      "private_settings": {}
+    },
+    {
+      "prev_ver": 537001985,
+      "name": "BRB",
+      "uuid": "8f009c58-5fd1-42a8-8106-28688da4456b",
+      "id": "scene",
+      "versioned_id": "scene",
+      "settings": {
+        "id_counter": 100,
+        "custom_size": false,
+        "items": [
+          {
+            "name": "BRB Overlay",
+            "source_uuid": "c99bdf0b-b6bc-4771-877e-f9e78f76f969",
+            "visible": true,
+            "locked": false,
+            "rot": 0,
+            "scale_ref": {
+              "x": 1920,
+              "y": 1080
+            },
+            "align": 5,
+            "bounds_type": 2,
+            "bounds_align": 0,
+            "bounds_crop": false,
+            "crop_left": 0,
+            "crop_top": 0,
+            "crop_right": 0,
+            "crop_bottom": 0,
+            "id": 1,
+            "group_item_backup": false,
+            "pos": {
+              "x": 0,
+              "y": 0
+            },
+            "pos_rel": {
+              "x": 0,
+              "y": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1
+            },
+            "scale_rel": {
+              "x": 1,
+              "y": 1
+            },
+            "bounds": {
+              "x": 1920,
+              "y": 1080
+            },
+            "bounds_rel": {
+              "x": 1,
+              "y": 1
+            },
+            "scale_filter": "disable",
+            "blend_method": "default",
+            "blend_type": "normal",
+            "show_transition": {
+              "duration": 300
+            },
+            "hide_transition": {
+              "duration": 300
+            },
+            "private_settings": {}
+          }
+        ]
+      },
+      "mixers": 0,
+      "sync": 0,
+      "flags": 0,
+      "volume": 1,
+      "balance": 0.5,
+      "enabled": true,
+      "muted": false,
+      "push-to-mute": false,
+      "push-to-mute-delay": 0,
+      "push-to-talk": false,
+      "push-to-talk-delay": 0,
+      "hotkeys": {
+        "OBSBasic.SelectScene": []
+      },
+      "deinterlace_mode": 0,
+      "deinterlace_field_order": 0,
+      "monitoring_type": 0,
+      "canvas_uuid": "6c69626f-6273-4c00-9d88-c5136d61696e",
+      "private_settings": {}
+    }
+  ],
+  "groups": [],
+  "scene_order": [
+    {
+      "name": "INTRO / BREAK"
+    },
+    {
+      "name": "DRAFT"
+    },
+    {
+      "name": "LIVE MATCH"
+    },
+    {
+      "name": "CASTERS"
+    },
+    {
+      "name": "MVP"
+    },
+    {
+      "name": "BRB"
+    }
+  ],
+  "current_scene": "LIVE MATCH",
+  "current_program_scene": "LIVE MATCH",
+  "canvases": [],
+  "current_transition": "Fade",
+  "transition_duration": 300,
+  "transitions": [],
+  "quick_transitions": [
+    {
+      "name": "Cut",
+      "duration": 300,
+      "hotkeys": [],
+      "id": 1,
+      "fade_to_black": false
+    },
+    {
+      "name": "Fade",
+      "duration": 300,
+      "hotkeys": [],
+      "id": 2,
+      "fade_to_black": false
+    },
+    {
+      "name": "Fade",
+      "duration": 300,
+      "hotkeys": [],
+      "id": 3,
+      "fade_to_black": true
+    }
+  ],
+  "saved_projectors": [],
+  "preview_locked": false,
+  "scaling_enabled": false,
+  "scaling_level": -1,
+  "scaling_off_x": 0,
+  "scaling_off_y": 0,
+  "modules": {},
+  "resolution": {
+    "x": 1920,
+    "y": 1080
+  },
+  "version": 2
+}

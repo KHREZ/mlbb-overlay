@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLBB Player Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #3b82f6;
+      --red: #ef4444;
+      --gold: #f59e0b;
+      --bg: #06080f;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      width: 1920px; height: 1080px;
+      overflow: hidden;
+      background: transparent;
+      font-family: 'Rajdhani', sans-serif;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .profile-card {
+      width: 800px;
+      background: linear-gradient(160deg, rgba(12, 16, 28, 0.97), rgba(24, 30, 46, 0.95));
+      border: 3px solid var(--gold);
+      border-radius: 20px;
+      padding: 36px;
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: scale(0.9) translateY(20px);
+      transition: all 0.6s cubic-bezier(0.14, 1.15, 0.3, 1.05);
+    }
+    .profile-card.visible {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    .profile-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(from 0deg, transparent, rgba(245, 158, 11, 0.06), transparent);
+      animation: shine 6s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes shine {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 28px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .player-avatar {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #b45309);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Teko';
+      font-size: 42px;
+      font-weight: 700;
+      color: #0f1120;
+      box-shadow: 0 0 24px rgba(245, 158, 11, 0.5);
+      flex-shrink: 0;
+    }
+
+    .player-info { flex: 1; }
+    .player-name {
+      font-family: 'Teko';
+      font-size: 56px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      line-height: 1;
+      color: #fff;
+    }
+    .player-team {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .player-role {
+      font-size: 16px;
+      font-weight: 700;
+      color: #94a3b8;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .hero-showcase {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 2;
+    }
+    .hero-card {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+    }
+    .hero-card.main {
+      border-color: var(--gold);
+      background: rgba(245, 158, 11, 0.08);
+    }
+    .hero-card .hero-img {
+      width: 60px; height: 60px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      margin-bottom: 6px;
+    }
+    .hero-card.main .hero-img {
+      border-color: var(--gold);
+    }
+    .hero-card .hero-name {
+      font-family: 'Teko';
+      font-size: 17px;
+      color: #e2e8f0;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .hero-card .hero-stat {
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 700;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      position: relative;
+      z-index: 2;
+    }
+    .stat-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 14px 10px;
+      text-align: center;
+    }
+    .stat-box .stat-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .stat-box .stat-value {
+      font-family: 'Teko';
+      font-size: 32px;
+      color: var(--gold);
+      line-height: 1;
+      margin-top: 4px;
+    }
+    .stat-box .stat-value.blue { color: #60a5fa; }
+    .stat-box .stat-value.red { color: #f87171; }
+  </style>
+</head>
+<body>
+
+  <div id="profileCard" class="profile-card">
+    <div class="profile-header">
+      <div id="avatar" class="player-avatar">P</div>
+      <div class="player-info">
+        <div id="playerName" class="player-name">PLAYER NAME</div>
+        <div id="playerTeam" class="player-team">TEAM TAG</div>
+        <div id="playerRole" class="player-role">ROLE</div>
+      </div>
+    </div>
+
+    <div id="heroShowcase" class="hero-showcase"></div>
+
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="stat-label">K / D / A</div>
+        <div id="statKda" class="stat-value">0 / 0 / 0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">GPM</div>
+        <div id="statGpm" class="stat-value blue">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">DMG%</div>
+        <div id="statDmg" class="stat-value red">0%</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Win Rate</div>
+        <div id="statWinrate" class="stat-value">0%</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function renderProfile(data) {
+      if (!data || !data.playerProfile) return;
+      const p = data.playerProfile;
+      const card = document.getElementById('profileCard');
+
+      if (!p.show) { card.classList.remove('visible'); return; }
+      card.classList.add('visible');
+
+      document.getElementById('playerName').innerText = p.name || 'PLAYER';
+      document.getElementById('playerTeam').innerText = p.team || 'TEAM';
+      document.getElementById('playerRole').innerText = p.role || 'ROLE';
+      document.getElementById('avatar').innerText = (p.name || 'P').charAt(0).toUpperCase();
+
+      document.getElementById('statKda').innerText = p.kda || '0 / 0 / 0';
+      document.getElementById('statGpm').innerText = p.gpm || '0';
+      document.getElementById('statDmg').innerText = (p.dmgPct || '0') + '%';
+      document.getElementById('statWinrate').innerText = (p.winrate || '0') + '%';
+
+      // Hero showcase
+      const showcase = document.getElementById('heroShowcase');
+      const heroes = p.heroes || [];
+      showcase.innerHTML = heroes.slice(0, 5).map((h, i) => `
+        <div class="hero-card${i === 0 ? ' main' : ''}">
+          ${h.icon ? `<img src="${h.icon}" class="hero-img">` : `<div class="hero-img" style="background:#1e293b;display:flex;align-items:center;justify-content:center;font-size:24px;color:#475569;">?</div>`}
+          <div class="hero-name">${h.name || '—'}</div>
+          <div class="hero-stat">${h.games || 0} games · ${h.winrate || 0}%</div>
+        </div>
+      `).join('');
+    }
+
+    async function init() {
+      const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}`);
+      ws.onmessage = (e) => {
+        try {
+          const m = JSON.parse(e.data);
+          if (m.type === 'INIT' || m.type === 'UPDATE') renderProfile(m.data);
+        } catch (_) {}
+      };
+      ws.onclose = () => setTimeout(init, 2000);
+      renderProfile(await (await fetch('/api/data')).json());
+    }
+
+    init();
+  </script>
+</body>
+</html>

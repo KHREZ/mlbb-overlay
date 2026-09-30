@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLBB Ban Phase Animation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;600;700&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #3b82f6;
+      --red: #ef4444;
+      --gold: #f59e0b;
+      --bg: #06080f;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      width: 1920px; height: 1080px;
+      overflow: hidden;
+      background: transparent;
+      font-family: 'Rajdhani', sans-serif;
+      color: #fff;
+    }
+
+    .phase-header {
+      position: absolute;
+      top: 40px; left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      animation: fadeDown 0.6s ease both;
+    }
+    @keyframes fadeDown {
+      from { transform: translateX(-50%) translateY(-30px); opacity: 0; }
+      to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+    .phase-title {
+      font-family: 'Teko';
+      font-size: 52px;
+      letter-spacing: 4px;
+      color: var(--gold);
+      text-transform: uppercase;
+      text-shadow: 0 0 20px rgba(245, 158, 11, 0.7);
+    }
+    .phase-subtitle {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: #94a3b8;
+      text-transform: uppercase;
+    }
+
+    .ban-grid {
+      position: absolute;
+      top: 160px; left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 80px;
+      align-items: flex-start;
+    }
+
+    .team-bans {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .team-label {
+      font-family: 'Teko';
+      font-size: 28px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .team-label.blue { color: #93c5fd; text-shadow: 0 0 12px rgba(96, 165, 250, 0.6); }
+    .team-label.red { color: #fca5a5; text-shadow: 0 0 12px rgba(248, 113, 113, 0.6); }
+
+    .ban-cards {
+      display: flex;
+      gap: 14px;
+    }
+
+    .ban-card {
+      width: 130px; height: 160px;
+      perspective: 600px;
+    }
+    .ban-card-inner {
+      width: 100%; height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.14, 1.15, 0.3, 1.05);
+    }
+    .ban-card.revealed .ban-card-inner {
+      transform: rotateY(180deg);
+    }
+    .ban-front, .ban-back {
+      position: absolute;
+      width: 100%; height: 100%;
+      backface-visibility: hidden;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .ban-front {
+      background: linear-gradient(180deg, #1e293b, #0f172a);
+      border: 2px solid #334155;
+    }
+    .ban-front .question {
+      font-family: 'Teko';
+      font-size: 60px;
+      color: #475569;
+    }
+    .ban-back {
+      background: linear-gradient(180deg, rgba(12, 16, 28, 0.97), rgba(24, 30, 46, 0.97));
+      border: 2px solid rgba(239, 68, 68, 0.6);
+      transform: rotateY(180deg);
+    }
+    .ban-back img {
+      width: 100%; height: 120px;
+      object-fit: cover;
+      filter: grayscale(50%) brightness(0.7);
+    }
+    .ban-back .ban-x {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 50px;
+      font-weight: 700;
+      color: #ef4444;
+      text-shadow: 0 0 10px #000, 0 0 20px rgba(239, 68, 68, 0.9);
+      background: radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, transparent 70%);
+    }
+    .ban-back .hero-name {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(0, 0, 0, 0.85);
+      padding: 4px;
+      text-align: center;
+      font-family: 'Teko';
+      font-size: 16px;
+      letter-spacing: 1px;
+      color: #e2e8f0;
+      text-transform: uppercase;
+    }
+
+    .ban-card.empty .ban-front {
+      border-style: dashed;
+      border-color: rgba(71, 85, 105, 0.4);
+    }
+    .ban-card.empty .question { color: #334155; font-size: 36px; }
+
+    /* Bottom branding */
+    .brand-bar {
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 1920px; height: 90px;
+      display: flex;
+      background: linear-gradient(180deg, transparent, rgba(6, 8, 15, 0.95));
+    }
+    .brand-side {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      padding: 0 50px;
+      gap: 16px;
+    }
+    .brand-side.blue { justify-content: flex-start; }
+    .brand-side.red { justify-content: flex-end; }
+    .brand-name {
+      font-family: 'Teko';
+      font-size: 38px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .brand-side.blue .brand-name { color: #93c5fd; }
+    .brand-side.red .brand-name { color: #fca5a5; }
+    .brand-score {
+      font-family: 'Teko';
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--gold);
+    }
+    .brand-center {
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-top: 2px solid rgba(245, 158, 11, 0.5);
+    }
+    .brand-center .game-num {
+      font-family: 'Teko';
+      font-size: 22px;
+      color: var(--gold);
+      letter-spacing: 3px;
+    }
+    .brand-center .format {
+      font-size: 13px;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 2px;
+    }
+
+    .ban-num {
+      position: absolute;
+      top: 6px; left: 8px;
+      font-family: 'Teko';
+      font-size: 16px;
+      color: #ef4444;
+      font-weight: 700;
+      z-index: 2;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="phase-header">
+    <div id="phaseTitle" class="phase-title">PICK & BAN PHASE</div>
+    <div id="phaseSubtitle" class="phase-subtitle">BANNING IN PROGRESS</div>
+  </div>
+
+  <div class="ban-grid">
+    <div class="team-bans">
+      <div id="teamALabel" class="team-label blue">BLUE TEAM</div>
+      <div id="bansA" class="ban-cards"></div>
+    </div>
+    <div class="team-bans">
+      <div id="teamBLabel" class="team-label red">RED TEAM</div>
+      <div id="bansB" class="ban-cards"></div>
+    </div>
+  </div>
+
+  <div class="brand-bar">
+    <div class="brand-side blue">
+      <div id="teamAName" class="brand-name">TEAM A</div>
+      <div id="scoreA" class="brand-score">0</div>
+    </div>
+    <div class="brand-center">
+      <div id="gameNum" class="game-num">GAME 1</div>
+      <div id="format" class="format">BO3</div>
+    </div>
+    <div class="brand-side red">
+      <div id="scoreB" class="brand-score">0</div>
+      <div id="teamBName" class="brand-name">TEAM B</div>
+    </div>
+  </div>
+
+  <script>
+    let heroesData = {};
+    let banCount = 3;
+    let revealedBans = { a: new Set(), b: new Set() };
+
+    async function loadHeroes() {
+      try {
+        const list = await (await fetch('/api/heroes')).json();
+        list.forEach(h => heroesData[h.id] = h);
+      } catch (e) {}
+    }
+
+    function hero(id) {
+      return heroesData[id] || { name: id ? id.replace(/_/g, ' ').toUpperCase() : 'TBD', icon: '' };
+    }
+
+    function renderBanCards(containerId, bans, team) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = '';
+      const set = revealedBans[team];
+      for (let i = 0; i < banCount; i++) {
+        const id = bans[i];
+        const h = hero(id);
+        const card = document.createElement('div');
+        card.className = 'ban-card' + (id ? '' : ' empty');
+        if (set.has(i)) card.classList.add('revealed');
+        card.style.animationDelay = (i * 0.15) + 's';
+
+        if (id) {
+          card.innerHTML = `
+            <div class="ban-card-inner">
+              <div class="ban-front">
+                <div class="ban-num">#${i + 1}</div>
+                <div class="question">?</div>
+              </div>
+              <div class="ban-back">
+                ${h.icon ? `<img src="${h.icon}" alt="">` : ''}
+                <div class="ban-x">✕</div>
+                <div class="hero-name">${h.name}</div>
+              </div>
+            </div>`;
+          // Auto-reveal with delay
+          setTimeout(() => {
+            if (!revealedBans[team].has(i)) {
+              revealedBans[team].add(i);
+              card.classList.add('revealed');
+            }
+          }, 800 + i * 1200);
+        } else {
+          card.innerHTML = `
+            <div class="ban-card-inner">
+              <div class="ban-front">
+                <div class="ban-num">#${i + 1}</div>
+                <div class="question">—</div>
+              </div>
+            </div>`;
+        }
+        container.appendChild(card);
+      }
+    }
+
+    function renderBanPhase(data) {
+      if (!data) return;
+      const a = data.teamA || {};
+      const b = data.teamB || {};
+
+      document.getElementById('teamALabel').innerText = (a.name || 'BLUE TEAM').toUpperCase();
+      document.getElementById('teamBLabel').innerText = (b.name || 'RED TEAM').toUpperCase();
+      document.getElementById('teamAName').innerText = a.name || 'TEAM A';
+      document.getElementById('teamBName').innerText = b.name || 'TEAM B';
+      document.getElementById('scoreA').innerText = a.score || 0;
+      document.getElementById('scoreB').innerText = b.score || 0;
+      document.getElementById('gameNum').innerText = 'GAME ' + (data.currentGame || 1);
+      document.getElementById('format').innerText = data.matchFormat || 'BO3';
+
+      banCount = Math.min(5, Math.max(1, parseInt(data.banCount) || 3));
+      renderBanCards('bansA', a.bans || [], 'a');
+      renderBanCards('bansB', b.bans || [], 'b');
+
+      if (data.draftState) {
+        document.getElementById('phaseTitle').innerText = data.draftState.phaseText || 'PICK & BAN PHASE';
+      }
+    }
+
+    async function init() {
+      await loadHeroes();
+      const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}`);
+      ws.onmessage = (e) => {
+        try {
+          const m = JSON.parse(e.data);
+          if (m.type === 'INIT' || m.type === 'UPDATE') renderBanPhase(m.data);
+        } catch (_) {}
+      };
+      ws.onclose = () => setTimeout(init, 2000);
+      renderBanPhase(await (await fetch('/api/data')).json());
+    }
+
+    init();
+  </script>
+</body>
+</html>
